@@ -11,7 +11,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'auth' => \App\Http\Middleware\Authenticate::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        ]);
+        
+        // Apply auth middleware to web routes group
+        $middleware->group('web', [
+            // Add CSRF protection to all web routes
+            \App\Http\Middleware\VerifyCsrfToken::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
