@@ -5,19 +5,19 @@
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="flex justify-between items-center">
-        <div>
+    <div class="flex justify-between items-center fade-in">
+        <div class="fade-in-slow">
             <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
             <p class="text-gray-500">Manage your system preferences and configurations</p>
         </div>
-        <div class="flex space-x-3">
-            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+        <div class="flex space-x-3 stagger-fade-in">
+            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2 hover-fade">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
                 <span>Reset to Defaults</span>
             </button>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2 hover-fade">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -29,7 +29,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <!-- Settings Navigation -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow p-4">
+            <div class="bg-white rounded-lg shadow p-4 fade-in scale-in">
                 <nav class="space-y-2">
                     <button class="w-full text-left px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg">General</button>
                     <button class="w-full text-left px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">Appearance</button>

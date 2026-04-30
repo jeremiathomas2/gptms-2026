@@ -39,6 +39,9 @@ class DatabaseSeeder extends Seeder
         DB::table('users')->truncate();
         DB::table('skills')->truncate();
 
+        // Seed roles first
+        $this->seedRoles();
+
         // Seed skills
         $this->seedSkills();
 
@@ -58,6 +61,19 @@ class DatabaseSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $this->command->info('Database seeding completed.');
+    }
+
+    private function seedRoles(): void
+    {
+        $roles = [
+            ['name' => 'admin', 'guard_name' => 'web'],
+            ['name' => 'supervisor', 'guard_name' => 'web'],
+            ['name' => 'student', 'guard_name' => 'web'],
+        ];
+
+        foreach ($roles as $role) {
+            \Spatie\Permission\Models\Role::create($role);
+        }
     }
 
     private function seedSkills(): void

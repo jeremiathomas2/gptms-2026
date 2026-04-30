@@ -22,14 +22,16 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <div id="app" class="flex h-screen">
+    <div id="app" class="flex h-screen fade-in">
         @include('layouts.sidebar')
         
         <div class="flex-1 flex flex-col {{ request()->cookie('sidebar_open') == 'false' ? 'ml-16' : 'ml-64' }} sidebar-transition">
             @include('layouts.header')
             
-            <main class="flex-1 p-8 overflow-auto">
-                @yield('content')
+            <main class="flex-1 p-8 overflow-auto page-transition">
+                <div class="fade-in-slow">
+                    @yield('content')
+                </div>
             </main>
         </div>
     </div>

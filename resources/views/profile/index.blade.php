@@ -5,19 +5,19 @@
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="flex justify-between items-center">
-        <div>
+    <div class="flex justify-between items-center fade-in">
+        <div class="fade-in-slow">
             <h1 class="text-2xl font-bold text-gray-900">Profile</h1>
             <p class="text-gray-500">Manage your personal information and preferences</p>
         </div>
-        <div class="flex space-x-3">
-            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+        <div class="flex space-x-3 stagger-fade-in">
+            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2 hover-fade">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 <span>Export Profile</span>
             </button>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2 hover-fade">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -29,7 +29,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Profile Overview -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white rounded-lg shadow p-6 fade-in scale-in">
                 <div class="text-center">
                     <div class="relative inline-block">
                         <img src="https://picsum.photos/seed/profile/120/120.jpg" alt="Profile" class="w-32 h-32 rounded-full mx-auto">

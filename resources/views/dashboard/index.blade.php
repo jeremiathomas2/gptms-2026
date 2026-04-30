@@ -5,19 +5,19 @@
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center fade-in">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
             <p class="text-gray-500">Welcome back to your management dashboard</p>
         </div>
         <div class="flex space-x-3">
-            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2 hover-fade">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 01-.707.293l-6.586-6.586a1 1 0 01-.293-.707V5a1 1 0 011-1H6a1 1 0 011-1V4z"/>
                 </svg>
                 <span>Export Report</span>
             </button>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2 hover-fade">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -27,7 +27,7 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger-fade-in">
         <!-- Total Groups -->
         <div class="bg-white rounded-lg shadow p-6 hover-scale">
             <div class="flex items-center justify-between">
@@ -112,7 +112,7 @@
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Activity Chart -->
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white rounded-lg shadow p-6 fade-in scale-in">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Activity Overview</h3>
                 <select class="text-sm border border-gray-300 rounded px-3 py-1">
@@ -132,7 +132,7 @@
         </div>
 
         <!-- Performance Metrics -->
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white rounded-lg shadow p-6 fade-in scale-in" style="animation-delay: 0.2s">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Performance Metrics</h3>
                 <button class="text-sm text-blue-600 hover:text-blue-800">
@@ -181,12 +181,12 @@
     </div>
 
     <!-- Recent Activity -->
-    <div class="bg-white rounded-lg shadow">
+    <div class="bg-white rounded-lg shadow fade-in slide-up" style="animation-delay: 0.4s">
         <div class="p-6 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
         </div>
         <div class="p-6">
-            <div class="space-y-4">
+            <div class="space-y-4 stagger-fade-in">
                 <div class="flex items-center space-x-4">
                     <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

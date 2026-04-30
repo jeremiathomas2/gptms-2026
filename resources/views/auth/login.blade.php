@@ -6,9 +6,9 @@
 <div class="h-screen flex items-center justify-center bg-gray-50 px-4">
     <div class="w-full max-w-md">
         <!-- Login Card -->
-        <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 form-container">
+        <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 form-container fade-in scale-in">
             <!-- Header -->
-            <div class="text-center mb-8">
+            <div class="text-center mb-8 fade-in-slow">
                 <div class="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
                     <span class="text-white font-bold text-xl">G</span>
                 </div>
@@ -17,7 +17,7 @@
                 </h2>
                 <p class="text-sm text-gray-600">
                     Or
-                    <a href="#" onclick="toggleRegister()" class="font-medium text-blue-600 hover:text-blue-500">
+                    <a href="#" onclick="toggleRegister()" class="font-medium text-blue-600 hover:text-blue-500 hover-fade">
                         create a new account
                     </a>
                 </p>

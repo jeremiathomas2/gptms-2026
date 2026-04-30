@@ -74,31 +74,82 @@
         @apply block;
     }
     
-    /* Animation classes */
+    /* Enhanced Animation classes */
     .fade-in {
-        animation: fadeIn 0.3s ease-in-out;
+        animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    
+    .fade-in-slow {
+        animation: fadeIn 0.8s ease-in-out forwards;
+    }
+    
+    .fade-in-fast {
+        animation: fadeIn 0.2s ease-in-out forwards;
     }
     
     .fade-out {
-        animation: fadeOut 0.3s ease-in-out;
+        animation: fadeOut 0.3s ease-in-out forwards;
     }
     
     .slide-down {
-        animation: slideDown 0.2s ease-out;
+        animation: slideDown 0.3s ease-out forwards;
+    }
+    
+    .slide-up {
+        animation: slideUp 0.3s ease-out forwards;
+    }
+    
+    .slide-left {
+        animation: slideLeft 0.3s ease-out forwards;
+    }
+    
+    .slide-right {
+        animation: slideRight 0.3s ease-out forwards;
+    }
+    
+    .scale-in {
+        animation: scaleIn 0.4s ease-out forwards;
     }
     
     .page-transition {
-        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
     }
     
     .page-transition.fade-out {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(15px);
     }
     
     .page-transition.fade-in {
         opacity: 1;
         transform: translateY(0);
+    }
+    
+    /* Staggered animations for lists */
+    .stagger-fade-in > * {
+        animation: fadeIn 0.5s ease-in-out forwards;
+        opacity: 0;
+    }
+    
+    .stagger-fade-in > *:nth-child(1) { animation-delay: 0.1s; }
+    .stagger-fade-in > *:nth-child(2) { animation-delay: 0.2s; }
+    .stagger-fade-in > *:nth-child(3) { animation-delay: 0.3s; }
+    .stagger-fade-in > *:nth-child(4) { animation-delay: 0.4s; }
+    .stagger-fade-in > *:nth-child(5) { animation-delay: 0.5s; }
+    .stagger-fade-in > *:nth-child(6) { animation-delay: 0.6s; }
+    
+    /* Hover fade effects */
+    .hover-fade {
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    .hover-fade:hover {
+        opacity: 0.8;
+    }
+    
+    /* Loading animations */
+    .pulse-fade {
+        animation: pulseFade 2s ease-in-out infinite;
     }
 }
 
@@ -113,20 +164,45 @@
     }
 }
 
-/* Custom animations */
+/* Enhanced Custom animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeOut {
     from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(10px); }
+    to { opacity: 0; transform: translateY(-20px); }
 }
 
 @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
+    from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideRight {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseFade {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
 
 /* Icon styles */
@@ -167,4 +243,22 @@
 
 ::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+/* Ensure dropdowns appear in front */
+#profile-menu {
+    z-index: 9999 !important;
+    position: absolute;
+}
+
+/* Header stacking context */
+header {
+    position: relative;
+    z-index: 40;
+}
+
+/* Profile dropdown container stacking */
+header .relative.z-50 {
+    position: relative;
+    z-index: 50;
 }
