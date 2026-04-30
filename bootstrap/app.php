@@ -16,9 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
         
-        // Apply auth middleware to web routes group
+        // Apply essential middleware to web routes group
         $middleware->group('web', [
-            // Add CSRF protection to all web routes
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
         ]);
     })
