@@ -22,7 +22,7 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <div id="app" class="flex h-screen fade-in">
+    <div id="app" class="flex h-screen">
         @include('layouts.sidebar')
         
         <div class="flex-1 flex flex-col {{ request()->cookie('sidebar_open') == 'false' ? 'ml-16' : 'ml-64' }} sidebar-transition">

@@ -16,7 +16,8 @@ class Authenticate
     public function handle(Request $request, Closure $next): Response
     {
         // Check if user is authenticated via session
-        if (!session('user.logged_in')) {
+        $user = session('user');
+        if (!$user || !isset($user['logged_in']) || !$user['logged_in']) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
@@ -40,6 +41,8 @@ class Authenticate
     protected function validateSessionSecurity(Request $request): void
     {
         $user = session('user');
+        if (!$user) return;
+        
         $currentTime = now()->timestamp;
 
         // Check for session timeout (30 minutes)
@@ -57,7 +60,8 @@ class Authenticate
         }
 
         // Update last activity timestamp
-        session(['user.last_activity' => $currentTime]);
+        $user['last_activity'] = $currentTime;
+        session(['user' => $user]);
 
         // Regenerate session ID periodically (every 5 minutes)
         if (!session()->has('last_regeneration') || ($currentTime - session('last_regeneration')) > 300) {

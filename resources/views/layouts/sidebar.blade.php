@@ -1,13 +1,13 @@
 <!-- Sidebar -->
-<aside id="sidebar" class="fixed left-0 top-0 h-full bg-gray-900 text-white z-50 {{ request()->cookie('sidebar_open') == 'false' ? 'w-16' : 'w-64' }} sidebar-transition fade-in">
+<aside id="sidebar" class="fixed left-0 top-0 h-full bg-gray-900 text-white z-50 {{ request()->cookie('sidebar_open') == 'false' ? 'w-16' : 'w-64' }} sidebar-transition">
     <!-- Logo Section -->
-    <div class="p-6 border-b border-gray-800 fade-in-slow">
+    <div class="p-6 border-b border-gray-800">
         <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center scale-in">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span class="text-white font-bold text-lg">G</span>
             </div>
             @if(request()->cookie('sidebar_open') != 'false')
-                <div class="fade-in" style="animation-delay: 0.2s">
+                <div>
                     <h1 class="text-xl font-bold">GPTFMS</h1>
                     <p class="text-xs text-gray-400">Management System</p>
                 </div>
@@ -17,7 +17,7 @@
     
     <!-- Navigation -->
     <nav class="p-4">
-        <ul class="space-y-2 stagger-fade-in">
+        <ul class="space-y-2">
             <!-- Dashboard -->
             <li>
                 <a href="{{ route('dashboard') }}" 
@@ -45,7 +45,7 @@
                             @endif
                         </div>
                         @if(request()->cookie('sidebar_open') != 'false')
-                            <svg class="icon-sm transform transition-transform {{ request()->is('groups*') ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg id="groups-chevron" class="icon-sm transform transition-transform {{ request()->is('groups*') ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         @endif
@@ -163,7 +163,7 @@
     </nav>
     
     <!-- Sidebar Toggle Button -->
-    <div class="absolute bottom-4 left-4 fade-in" style="animation-delay: 0.8s">
+    <div class="absolute bottom-4 left-4">
         <button onclick="toggleSidebar()" 
                 class="p-2 rounded-lg hover:bg-gray-800 transition-colors hover-fade hover-scale">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,28 +205,70 @@ function toggleGroupsDropdown() {
     const dropdown = document.getElementById('groups-dropdown');
     const chevron = document.getElementById('groups-chevron');
     
+    if (!dropdown) {
+        console.error('Groups dropdown not found');
+        return;
+    }
+    
+    if (!chevron) {
+        console.error('Groups chevron not found');
+        return;
+    }
+    
+    console.log('Toggling dropdown, current state:', dropdown.classList.contains('hidden'));
+    
     if (dropdown.classList.contains('hidden')) {
         dropdown.classList.remove('hidden');
         dropdown.classList.add('dropdown-enter');
         chevron.classList.add('rotate-180');
+        console.log('Dropdown opened');
     } else {
         dropdown.classList.add('hidden');
+        dropdown.classList.remove('dropdown-enter');
         chevron.classList.remove('rotate-180');
+        console.log('Dropdown closed');
     }
 }
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('groups-dropdown');
+    const chevron = document.getElementById('groups-chevron');
+    const button = event.target.closest('button[onclick="toggleGroupsDropdown()"]');
+    
+    if (dropdown && !dropdown.classList.contains('hidden') && 
+        (!button || button.getAttribute('onclick') !== 'toggleGroupsDropdown()')) {
+        dropdown.classList.add('hidden');
+        if (chevron) {
+            chevron.classList.remove('rotate-180');
+        }
+    }
+});
+
+// Prevent dropdown from closing when clicking inside
+document.getElementById('groups-dropdown')?.addEventListener('click', function(event) {
+    event.stopPropagation();
+});
 
 // Auto-show groups dropdown if on groups pages
 document.addEventListener('DOMContentLoaded', function() {
     const groupsDropdown = document.getElementById('groups-dropdown');
     const groupsChevron = document.getElementById('groups-chevron');
     
+    console.log('Dropdown elements found:', !!groupsDropdown, !!groupsChevron);
+    
+    // Ensure dropdown starts hidden
+    if (groupsDropdown) {
+        groupsDropdown.classList.add('hidden');
+        console.log('Dropdown initialized as hidden');
+    }
+    
     @if(request()->is('groups*'))
-        if (groupsDropdown) {
+        if (groupsDropdown && groupsChevron) {
             groupsDropdown.classList.remove('hidden');
             groupsDropdown.classList.add('dropdown-enter');
-            if (groupsChevron) {
-                groupsChevron.classList.add('rotate-180');
-            }
+            groupsChevron.classList.add('rotate-180');
+            console.log('Dropdown auto-opened for groups page');
         }
     @endif
 });

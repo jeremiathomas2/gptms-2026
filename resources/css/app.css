@@ -262,3 +262,76 @@ header .relative.z-50 {
     position: relative;
     z-index: 50;
 }
+
+/* Menu icon enhancements */
+header button[onclick="toggleSidebar()"] {
+    position: relative;
+    overflow: hidden;
+}
+
+header button[onclick="toggleSidebar()"]:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+header button[onclick="toggleSidebar()"]:active {
+    transform: scale(0.95);
+}
+
+/* Menu icon animation */
+header button[onclick="toggleSidebar()"] svg {
+    transition: transform 0.3s ease;
+}
+
+header button[onclick="toggleSidebar()"]:hover svg {
+    transform: scale(1.1);
+}
+
+/* Groups dropdown improvements */
+#groups-dropdown {
+    min-width: 192px;
+    max-width: 256px;
+    position: absolute !important;
+    display: block !important;
+}
+
+#groups-dropdown.dropdown-enter {
+    animation: slideDown 0.3s ease-out;
+}
+
+#groups-dropdown.hidden {
+    display: none !important;
+}
+
+.sidebar-dropdown-item {
+    transition: all 0.2s ease;
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    color: white;
+    text-decoration: none;
+    border-radius: 0.375rem;
+}
+
+.sidebar-dropdown-item:hover {
+    transform: translateX(4px);
+    background-color: rgba(59, 130, 246, 0.1);
+    color: white;
+}
+
+/* Dropdown positioning fix for collapsed sidebar */
+aside.w-16 #groups-dropdown {
+    left: 100%;
+    top: 0;
+    margin-left: 0.5rem;
+}
+
+/* Ensure dropdown stays above other elements */
+#groups-dropdown {
+    z-index: 9999 !important;
+}
+
+/* Make sure dropdown is visible when not hidden */
+#groups-dropdown:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}

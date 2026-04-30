@@ -1,18 +1,29 @@
 <!-- Header -->
-<header class="bg-white border-b border-gray-200 px-8 py-4 fade-in relative z-40">
+<header class="bg-white border-b border-gray-200 px-8 py-4 relative z-40">
     <div class="flex items-center justify-between">
-        <!-- Page Title -->
-        <div class="fade-in-slow">
-            <h1 class="text-2xl font-bold text-gray-900">
-                {{ $title ?? 'Dashboard' }}
-            </h1>
-            <p class="text-sm text-gray-500">
-                {{ $subtitle ?? 'Welcome back to your dashboard' }}
-            </p>
+        <!-- Left Section: Menu Icon + Page Title -->
+        <div class="flex items-center space-x-4">
+            <!-- Menu Toggle Button -->
+            <button onclick="toggleSidebar()" 
+                    class="p-2 rounded-lg hover:bg-gray-100 transition-colors hover-fade hover-scale">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            
+            <!-- Page Title -->
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    {{ $title ?? 'Dashboard' }}
+                </h1>
+                <p class="text-sm text-gray-500">
+                    {{ $subtitle ?? 'Welcome back to your dashboard' }}
+                </p>
+            </div>
         </div>
         
         <!-- Header Actions -->
-        <div class="flex items-center space-x-4 stagger-fade-in">
+        <div class="flex items-center space-x-4">
             <!-- Notifications -->
             <div class="relative">
                 <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors relative hover-fade hover-scale">

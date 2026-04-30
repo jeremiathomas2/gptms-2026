@@ -24,6 +24,7 @@ Route::middleware('guest')->group(function () {
             'name' => 'Demo User',
             'logged_in' => true,
             'login_time' => now()->timestamp,
+            'last_activity' => now()->timestamp,
             'ip_address' => $request->ip()
         ]);
 
@@ -125,7 +126,7 @@ Route::middleware('auth')->group(function () {
     })->name('help');
 });
 
-// Fallback route (must be last) - redirect all unknown routes to login
+// Fallback route (must be last) - only redirect unknown routes to login for guest users
 Route::get('/{path?}', function () {
     return redirect()->route('login');
 })->where('path', '.*')->middleware('guest');
