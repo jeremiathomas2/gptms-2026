@@ -98,18 +98,8 @@
                        placeholder="Enter your phone number">
             </div>
 
-            <!-- Registration Number Field -->
-            <div>
-                <label for="registration_number" class="block text-sm font-medium text-gray-700 mb-2">
-                    Registration Number *
-                </label>
-                <input id="registration_number" name="registration_number" type="text" required
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                       placeholder="Enter your registration number">
-                <p class="mt-1 text-xs text-gray-500">
-                    Your unique registration or student ID number.
-                </p>
-            </div>
+            <!-- Registration Number Field - will be dynamically added for students -->
+            <div id="registration-number-wrapper"></div>
 
             <!-- Password Field -->
             <div>
@@ -198,32 +188,175 @@
     </div>
 </div>
 
+<style>
+.registration-number-field.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Additional hiding styles */
+#registration-number-container.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Supervisor role styles */
+input[name="role"]:checked[value="supervisor"] ~ #registration-number-container {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+</style>
+
 <script>
-// Role switching functionality
+// Enhanced role switching functionality
 document.addEventListener('DOMContentLoaded', function() {
     const studentRadio = document.getElementById('student');
     const supervisorRadio = document.getElementById('supervisor');
-    const registrationNumberField = document.getElementById('registration_number').closest('div');
     const roleDescription = document.getElementById('role-description');
     
-    function toggleRegistrationNumber() {
-        if (supervisorRadio.checked) {
-            // Hide registration number for supervisor
-            registrationNumberField.style.display = 'none';
-            roleDescription.textContent = 'Supervisors can create and manage groups and projects.';
-        } else {
-            // Show registration number for student
-            registrationNumberField.style.display = 'block';
-            roleDescription.textContent = 'Students can join groups and participate in projects.';
-        }
+    // Cache DOM elements for better performance
+    let registrationWrapper = null;
+    let registrationContainer = null;
+    let registrationInput = null;
+    
+    function getRegistrationElements() {
+        registrationWrapper = document.getElementById('registration-number-wrapper');
+        registrationContainer = document.getElementById('registration-number-container');
+        registrationInput = document.getElementById('registration_number');
     }
     
-    // Add event listeners
-    studentRadio.addEventListener('change', toggleRegistrationNumber);
-    supervisorRadio.addEventListener('change', toggleRegistrationNumber);
+    function toggleRegistrationNumber() {
+        console.log('Role toggle called. Student checked:', studentRadio.checked, 'Supervisor checked:', supervisorRadio.checked);
+        
+        // Get current elements
+        getRegistrationElements();
+        
+        // Add loading state for visual feedback
+        const wrapper = document.getElementById('registration-number-wrapper');
+        wrapper.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        wrapper.style.opacity = '0.5';
+        
+        // Use setTimeout for smooth transition
+        setTimeout(() => {
+            if (supervisorRadio.checked) {
+                // Completely remove registration number field for supervisor
+                wrapper.innerHTML = '';
+                wrapper.style.opacity = '1';
+                roleDescription.textContent = 'Supervisors can create and manage groups and projects.';
+                console.log('Supervisor selected - registration number field completely removed');
+            } else {
+                // Add registration number field for student with smooth entrance
+                wrapper.innerHTML = `
+                    <div id="registration-number-container" class="mb-4" style="opacity: 0; transform: translateY(-10px); transition: all 0.3s ease;">
+                        <label for="registration_number" class="block text-sm font-medium text-gray-700 mb-2">
+                            Registration Number *
+                        </label>
+                        <input id="registration_number" name="registration_number" type="text" required="required"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Enter your registration number">
+                        <p class="mt-1 text-xs text-gray-500">
+                            Your unique registration or student ID number.
+                        </p>
+                    </div>
+                `;
+                roleDescription.textContent = 'Students can join groups and participate in projects.';
+                console.log('Student selected - registration number field added');
+                
+                // Animate field entrance
+                setTimeout(() => {
+                    const newContainer = document.getElementById('registration-number-container');
+                    if (newContainer) {
+                        newContainer.style.opacity = '1';
+                        newContainer.style.transform = 'translateY(0)';
+                    }
+                }, 50);
+            }
+        }, 150);
+    }
     
-    // Initialize on page load
-    toggleRegistrationNumber();
+    // Add enhanced event listeners with comprehensive debugging
+    if (studentRadio && supervisorRadio && roleDescription) {
+        // Debounce function to prevent rapid switching
+        let debounceTimer = null;
+        
+        function debouncedToggle() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                toggleRegistrationNumber();
+            }, 100);
+        }
+        
+        // Enhanced event listeners with visual feedback and debugging
+        studentRadio.addEventListener('change', function() {
+            console.log('=== Student radio clicked ===');
+            console.log('Student checked after click:', studentRadio.checked);
+            console.log('Supervisor checked after click:', supervisorRadio.checked);
+            // Add visual feedback to radio button
+            studentRadio.parentElement.classList.add('ring-2', 'ring-blue-500');
+            setTimeout(() => {
+                studentRadio.parentElement.classList.remove('ring-2', 'ring-blue-500');
+            }, 300);
+            debouncedToggle();
+        });
+        
+        supervisorRadio.addEventListener('change', function() {
+            console.log('=== Supervisor radio clicked ===');
+            console.log('Student checked after click:', studentRadio.checked);
+            console.log('Supervisor checked after click:', supervisorRadio.checked);
+            // Add visual feedback to radio button
+            supervisorRadio.parentElement.classList.add('ring-2', 'ring-blue-500');
+            setTimeout(() => {
+                supervisorRadio.parentElement.classList.remove('ring-2', 'ring-blue-500');
+            }, 300);
+            debouncedToggle();
+        });
+        
+        // Initialize on page load with enhanced error checking
+        console.log('Initializing role toggle on page load');
+        console.log('Student radio found:', !!studentRadio);
+        console.log('Supervisor radio found:', !!supervisorRadio);
+        console.log('Role description found:', !!roleDescription);
+        
+        if (studentRadio && supervisorRadio) {
+            console.log('Student radio checked:', studentRadio.checked);
+            console.log('Supervisor radio checked:', supervisorRadio.checked);
+            
+            // Initialize with immediate execution (no delay needed)
+            toggleRegistrationNumber();
+            console.log('Role toggle initialized immediately');
+        } else {
+            console.error('Required elements not found for role switching');
+        }
+    } else {
+        console.error('Required elements not found for role switching');
+    }
 });
 
 // Enhanced form validation for GPTFMS system
@@ -232,8 +365,10 @@ document.querySelector('form').addEventListener('submit', function(e) {
     const lastName = document.getElementById('last_name').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
-    const registrationNumber = document.getElementById('registration_number').value.trim();
-    const role = document.getElementById('role').value;
+    const registrationNumberInput = document.getElementById('registration_number');
+    const registrationNumber = registrationNumberInput ? registrationNumberInput.value.trim() : '';
+    const selectedRole = document.querySelector('input[name="role"]:checked');
+    const role = selectedRole ? selectedRole.value : '';
     const password = document.getElementById('password').value;
     const passwordConfirmation = document.getElementById('password_confirmation').value;
     const terms = document.getElementById('terms').checked;
@@ -288,6 +423,21 @@ document.querySelector('form').addEventListener('submit', function(e) {
     // Registration number validation (only for students)
     const isStudent = document.getElementById('student').checked;
     if (isStudent) {
+        // Check if registration number field exists and has required attribute
+        const registrationField = document.getElementById('registration_number');
+        if (!registrationField) {
+            e.preventDefault();
+            showError('Registration number field not found. Please try again.');
+            return false;
+        }
+        
+        // Check if field is properly required
+        if (!registrationField.hasAttribute('required')) {
+            e.preventDefault();
+            showError('Registration number field is not properly configured. Please refresh the page.');
+            return false;
+        }
+        
         if (!registrationNumber || registrationNumber.length < 3) {
             e.preventDefault();
             showError('Registration number must be at least 3 characters long.');
@@ -302,7 +452,8 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
     
     // Role validation
-    if (!role || (role !== 'student' && role !== 'supervisor')) {
+    const selectedRole = document.querySelector('input[name="role"]:checked');
+    if (!selectedRole || (selectedRole.value !== 'student' && selectedRole.value !== 'supervisor')) {
         e.preventDefault();
         showError('Please select your user type.');
         return false;
