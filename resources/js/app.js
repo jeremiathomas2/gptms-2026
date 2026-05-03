@@ -271,6 +271,7 @@ function initializeDropdowns() {
         document.addEventListener('click', function(e) {
             if (!groupsButton.contains(e.target) && !groupsDropdown.contains(e.target)) {
                 groupsDropdown.classList.add('hidden');
+                document.getElementById('groups-chevron').classList.remove('rotate-180');
             }
         });
         
@@ -279,6 +280,14 @@ function initializeDropdowns() {
             e.stopPropagation();
         });
     }
+    
+    // Add click listeners to other menu items to close dropdowns
+    const menuLinks = document.querySelectorAll('.sidebar-link:not([onclick*="toggleGroupsDropdown"])');
+    menuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            closeAllDropdowns();
+        });
+    });
     
     // Specific Profile dropdown handling
     const profileDropdown = document.getElementById('profile-dropdown');
@@ -464,7 +473,7 @@ function initializeTheme() {
 // Utility functions
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
-    notification.className = `notification notification-${type} fade-in`;
+    notification.className = `notification notification-${type}`;
     notification.innerHTML = `
         <div class="notification-content">
             <span class="notification-message">${message}</span>
@@ -528,46 +537,24 @@ function throttle(func, limit) {
     };
 }
 
-// Page navigation with transitions
-function navigateToPage(url) {
-    // Add fade out effect
-    document.body.classList.add('fade-out');
-    
-    // Navigate after transition
-    setTimeout(() => {
-        window.location.href = url;
-    }, 300);
-}
-
-// Initialize page transitions
+// Initialize page transitions (removed to prevent header/sidebar fading)
 function initializePageTransitions() {
-    // Add fade-in effect on page load
-    document.body.classList.add('page-transition', 'fade-in');
-    
-    // Handle internal navigation links
-    document.addEventListener('click', function(e) {
-        const link = e.target.closest('a');
-        if (link && link.href && link.hostname === window.location.hostname) {
-            e.preventDefault();
-            navigateToPage(link.href);
-        }
-    });
-    
-    // Handle form submissions with transitions
-    document.addEventListener('submit', function(e) {
-        const form = e.target;
-        if (form.tagName === 'FORM' && !form.hasAttribute('data-no-transition')) {
-            document.body.classList.add('fade-out');
-        }
-    });
+    // Page transitions disabled - only content area should fade
 }
 
-// Groups dropdown toggle function
-function toggleGroupsDropdown() {
-    const dropdown = document.getElementById('groups-dropdown');
-    if (dropdown) {
-        dropdown.classList.toggle('hidden');
-    }
+// Close all dropdowns function
+function closeAllDropdowns() {
+    const dropdowns = document.querySelectorAll('.dropdown-menu');
+    const chevrons = document.querySelectorAll('[id$="-chevron"]');
+    
+    dropdowns.forEach(dropdown => {
+        dropdown.classList.add('hidden');
+        dropdown.classList.remove('dropdown-enter');
+    });
+    
+    chevrons.forEach(chevron => {
+        chevron.classList.remove('rotate-180');
+    });
 }
 
 // Fallback profile dropdown function
@@ -625,8 +612,6 @@ window.GPTFMS = {
     initializeForms,
     initializeNotifications,
     initializeTheme,
-    toggleGroupsDropdown,
-    toggleProfileDropdown,
     navigateToPage,
     initializePageTransitions
 };

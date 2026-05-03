@@ -72,7 +72,7 @@
         <div class="flex-1 flex flex-col">
             @include('layouts.header-login')
             
-            <main class="flex-1 overflow-hidden">
+            <main class="flex-1 overflow-auto">
                 @yield('content')
             </main>
         </div>

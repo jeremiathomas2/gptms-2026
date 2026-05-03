@@ -32,8 +32,8 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Users</p>
-                    <p class="text-2xl font-bold text-gray-900">45</p>
-                    <p class="text-xs text-green-600 mt-1">+8 this month</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $users->count() }}</p>
+                    <p class="text-xs text-green-600 mt-1">Registered users</p>
                 </div>
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,8 +46,8 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Active Users</p>
-                    <p class="text-2xl font-bold text-gray-900">32</p>
-                    <p class="text-xs text-green-600 mt-1">71% active rate</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $users->where('status', 'active')->count() }}</p>
+                    <p class="text-xs text-green-600 mt-1">{{ $users->count() > 0 ? round(($users->where('status', 'active')->count() / $users->count()) * 100) : 0 }}% active rate</p>
                 </div>
                 <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +60,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Admin Users</p>
-                    <p class="text-2xl font-bold text-gray-900">3</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $users->filter(function($user) { return $user->hasRole('admin'); })->count() }}</p>
                     <p class="text-xs text-gray-500 mt-1">System administrators</p>
                 </div>
                 <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -73,9 +73,9 @@
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">New Users</p>
-                    <p class="text-2xl font-bold text-gray-900">5</p>
-                    <p class="text-xs text-blue-600 mt-1">This week</p>
+                    <p class="text-sm font-medium text-gray-600">Students</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $users->filter(function($user) { return $user->hasRole('student'); })->count() }}</p>
+                    <p class="text-xs text-blue-600 mt-1">Student accounts</p>
                 </div>
                 <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,281 +135,78 @@
 
     <!-- Users Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- User Card 1 -->
-        <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center space-x-4 mb-4">
-                    <img src="https://picsum.photos/seed/admin1/64/64.jpg" alt="Admin" class="w-16 h-16 rounded-full">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">John Doe</h3>
-                        <p class="text-sm text-gray-500">john.doe@university.edu</p>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded">Admin</span>
-                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Active</span>
+        @forelse ($users as $user)
+            <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <img src="https://picsum.photos/seed/{{ $user->email }}/64/64.jpg" alt="{{ $user->name }}" class="w-16 h-16 rounded-full">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h3>
+                            <p class="text-sm text-gray-500">{{ $user->email }}</p>
+                            <div class="flex items-center space-x-2 mt-1">
+                                @if ($user->hasRole('admin'))
+                                    <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded">Admin</span>
+                                @elseif ($user->hasRole('supervisor'))
+                                    <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">Supervisor</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Student</span>
+                                @endif
+                                
+                                @if ($user->status === 'active')
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Active</span>
+                                @elseif ($user->status === 'inactive')
+                                    <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded">Inactive</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded">Suspended</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Phone</span>
+                            <span class="font-medium">{{ $user->phone ?? 'Not provided' }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Groups</span>
+                            <span class="font-medium">{{ $user->groupMemberships()->count() }} groups</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Last Active</span>
+                            <span class="font-medium">{{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Never' }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Joined</span>
+                            <span class="font-medium">{{ $user->created_at->format('M d, Y') }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2 mt-4">
+                        <button onclick="viewUser({{ $user->id }})" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">View</button>
+                        <button onclick="editUser({{ $user->id }})" class="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">Edit</button>
+                        <button onclick="deleteUser({{ $user->id }}, '{{ $user->name }}')" class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Department</span>
-                        <span class="font-medium">Computer Science</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Groups</span>
-                        <span class="font-medium">3 groups</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Last Active</span>
-                        <span class="font-medium">2 hours ago</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Joined</span>
-                        <span class="font-medium">Jan 15, 2024</span>
-                    </div>
-                </div>
-                
-                <div class="flex space-x-2 mt-4">
-                    <button class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">View</button>
-                    <button class="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">Edit</button>
-                    <button class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
+            </div>
+        @empty
+            <div class="col-span-full">
+                <div class="bg-white rounded-lg shadow p-8 text-center">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+                    <p class="text-gray-500">Get started by adding your first user.</p>
+                    <button onclick="addUser()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        Add User
                     </button>
                 </div>
             </div>
-        </div>
-
-        <!-- User Card 2 -->
-        <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center space-x-4 mb-4">
-                    <img src="https://picsum.photos/seed/supervisor1/64/64.jpg" alt="Supervisor" class="w-16 h-16 rounded-full">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Jane Smith</h3>
-                        <p class="text-sm text-gray-500">jane.smith@university.edu</p>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">Supervisor</span>
-                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Active</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Department</span>
-                        <span class="font-medium">Engineering</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Groups</span>
-                        <span class="font-medium">2 groups</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Last Active</span>
-                        <span class="font-medium">1 day ago</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Joined</span>
-                        <span class="font-medium">Jan 20, 2024</span>
-                    </div>
-                </div>
-                
-                <div class="flex space-x-2 mt-4">
-                    <button class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">View</button>
-                    <button class="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">Edit</button>
-                    <button class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- User Card 3 -->
-        <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center space-x-4 mb-4">
-                    <img src="https://picsum.photos/seed/student1/64/64.jpg" alt="Student" class="w-16 h-16 rounded-full">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Alice Johnson</h3>
-                        <p class="text-sm text-gray-500">alice.johnson@student.edu</p>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Student</span>
-                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Active</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Department</span>
-                        <span class="font-medium">Business</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Groups</span>
-                        <span class="font-medium">1 group</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Last Active</span>
-                        <span class="font-medium">3 hours ago</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Joined</span>
-                        <span class="font-medium">Jan 25, 2024</span>
-                    </div>
-                </div>
-                
-                <div class="flex space-x-2 mt-4">
-                    <button class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">View</button>
-                    <button class="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">Edit</button>
-                    <button class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- User Card 4 -->
-        <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center space-x-4 mb-4">
-                    <img src="https://picsum.photos/seed/student2/64/64.jpg" alt="Student" class="w-16 h-16 rounded-full">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Bob Wilson</h3>
-                        <p class="text-sm text-gray-500">bob.wilson@student.edu</p>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Student</span>
-                            <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded">Inactive</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Department</span>
-                        <span class="font-medium">Computer Science</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Groups</span>
-                        <span class="font-medium">0 groups</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Last Active</span>
-                        <span class="font-medium">2 weeks ago</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Joined</span>
-                        <span class="font-medium">Jan 10, 2024</span>
-                    </div>
-                </div>
-                
-                <div class="flex space-x-2 mt-4">
-                    <button class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">View</button>
-                    <button class="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">Edit</button>
-                    <button class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- User Card 5 -->
-        <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center space-x-4 mb-4">
-                    <img src="https://picsum.photos/seed/supervisor2/64/64.jpg" alt="Supervisor" class="w-16 h-16 rounded-full">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Mike Brown</h3>
-                        <p class="text-sm text-gray-500">mike.brown@university.edu</p>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">Supervisor</span>
-                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Active</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Department</span>
-                        <span class="font-medium">Computer Science</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Groups</span>
-                        <span class="font-medium">4 groups</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Last Active</span>
-                        <span class="font-medium">5 hours ago</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Joined</span>
-                        <span class="font-medium">Jan 5, 2024</span>
-                    </div>
-                </div>
-                
-                <div class="flex space-x-2 mt-4">
-                    <button class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">View</button>
-                    <button class="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">Edit</button>
-                    <button class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- User Card 6 -->
-        <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center space-x-4 mb-4">
-                    <img src="https://picsum.photos/seed/student3/64/64.jpg" alt="Student" class="w-16 h-16 rounded-full">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Sarah Davis</h3>
-                        <p class="text-sm text-gray-500">sarah.davis@student.edu</p>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Student</span>
-                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Active</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Department</span>
-                        <span class="font-medium">Engineering</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Groups</span>
-                        <span class="font-medium">2 groups</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Last Active</span>
-                        <span class="font-medium">30 minutes ago</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Joined</span>
-                        <span class="font-medium">Feb 1, 2024</span>
-                    </div>
-                </div>
-                
-                <div class="flex space-x-2 mt-4">
-                    <button class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">View</button>
-                    <button class="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">Edit</button>
-                    <button class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
+        @endforelse
     </div>
 
     <!-- Pagination -->
@@ -435,4 +232,142 @@
         </div>
     </div>
 </div>
+
+<script>
+// User management functions
+function viewUser(userId) {
+    // Navigate to user detail page or show modal
+    console.log('View user:', userId);
+    // For now, show a notification
+    showNotification('User details view coming soon!', 'info');
+}
+
+function editUser(userId) {
+    // Navigate to user edit page or show modal
+    console.log('Edit user:', userId);
+    // For now, show a notification
+    showNotification('User edit functionality coming soon!', 'info');
+}
+
+function deleteUser(userId, userName) {
+    // Confirm and delete user
+    if (confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
+        console.log('Delete user:', userId);
+        // For now, show a notification
+        showNotification(`User "${userName}" deletion functionality coming soon!`, 'warning');
+    }
+}
+
+function addUser() {
+    // Navigate to user creation page or show modal
+    console.log('Add new user');
+    // For now, show a notification
+    showNotification('User creation functionality coming soon!', 'info');
+}
+
+// Search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[placeholder="Search users..."]');
+    const roleFilter = document.querySelector('select');
+    const statusFilter = document.querySelectorAll('select')[1];
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const userCards = document.querySelectorAll('.grid > div');
+            
+            userCards.forEach(card => {
+                const userName = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                const userEmail = card.querySelector('p')?.textContent.toLowerCase() || '';
+                
+                if (userName.includes(searchTerm) || userEmail.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    if (roleFilter) {
+        roleFilter.addEventListener('change', function(e) {
+            filterUsers('role', e.target.value);
+        });
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function(e) {
+            filterUsers('status', e.target.value);
+        });
+    }
+});
+
+function filterUsers(filterType, filterValue) {
+    const userCards = document.querySelectorAll('.grid > div');
+    
+    userCards.forEach(card => {
+        if (filterType === 'role') {
+            const roleBadge = card.querySelector('.bg-purple-100, .bg-blue-100, .bg-green-100');
+            const roleText = roleBadge?.textContent.toLowerCase() || '';
+            
+            if (filterValue === 'all' || roleText.includes(filterValue)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        } else if (filterType === 'status') {
+            const statusBadge = card.querySelectorAll('.bg-green-100, .bg-yellow-100, .bg-red-100')[1];
+            const statusText = statusBadge?.textContent.toLowerCase() || '';
+            
+            if (filterValue === 'all' || statusText.includes(filterValue)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        }
+    });
+}
+
+// Show notification function (reuse from app.js)
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    
+    // Add notification styles if not already present
+    if (!document.querySelector('#notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 6px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            }
+            .notification-info { background-color: #3b82f6; }
+            .notification-success { background-color: #10b981; }
+            .notification-warning { background-color: #f59e0b; }
+            .notification-error { background-color: #ef4444; }
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
 @endsection

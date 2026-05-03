@@ -28,8 +28,8 @@
         <div class="flex-1 flex flex-col {{ request()->cookie('sidebar_open') == 'false' ? 'ml-16' : 'ml-64' }} sidebar-transition">
             @include('layouts.header')
             
-            <main class="flex-1 p-8 overflow-auto page-transition">
-                <div class="fade-in-slow">
+            <main class="flex-1 p-8 overflow-auto">
+                <div>
                     @yield('content')
                 </div>
             </main>

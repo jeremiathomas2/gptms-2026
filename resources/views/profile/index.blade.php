@@ -5,19 +5,19 @@
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="flex justify-between items-center fade-in">
-        <div class="fade-in-slow">
+    <div class="flex justify-between items-center">
+        <div>
             <h1 class="text-2xl font-bold text-gray-900">Profile</h1>
             <p class="text-gray-500">Manage your personal information and preferences</p>
         </div>
-        <div class="flex space-x-3 stagger-fade-in">
-            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2 hover-fade">
+        <div class="flex space-x-3">
+            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 <span>Export Profile</span>
             </button>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2 hover-fade">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -29,10 +29,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Profile Overview -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow p-6 fade-in scale-in">
+            <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-center">
                     <div class="relative inline-block">
-                        <img src="https://picsum.photos/seed/profile/120/120.jpg" alt="Profile" class="w-32 h-32 rounded-full mx-auto">
+                        <img src="https://picsum.photos/seed/{{ session('user.email') ?? 'profile' }}/120/120.jpg" alt="Profile" class="w-32 h-32 rounded-full mx-auto">
                         <button class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
@@ -40,10 +40,18 @@
                             </svg>
                         </button>
                     </div>
-                    <h2 class="mt-4 text-xl font-semibold text-gray-900">John Doe</h2>
-                    <p class="text-sm text-gray-500">john.doe@university.edu</p>
+                    <h2 class="mt-4 text-xl font-semibold text-gray-900">{{ session('user.name') ?? 'User Name' }}</h2>
+                    <p class="text-sm text-gray-500">{{ session('user.email') ?? 'user@example.com' }}</p>
                     <div class="mt-4 flex items-center justify-center space-x-2">
-                        <span class="px-3 py-1 text-sm font-medium bg-purple-100 text-purple-800 rounded">Admin</span>
+                        @if(session('user.role'))
+                            @if(session('user.role') === 'admin')
+                                <span class="px-3 py-1 text-sm font-medium bg-purple-100 text-purple-800 rounded">Admin</span>
+                            @elseif(session('user.role') === 'supervisor')
+                                <span class="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded">Supervisor</span>
+                            @else
+                                <span class="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded">Student</span>
+                            @endif
+                        @endif
                         <span class="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded">Active</span>
                     </div>
                 </div>

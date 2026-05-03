@@ -5,25 +5,25 @@
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="flex justify-between items-center fade-in">
-        <div class="fade-in-slow">
+    <div class="flex justify-between items-center">
+        <div>
             <h1 class="text-2xl font-bold text-gray-900">Groups Management</h1>
             <p class="text-gray-500">Manage and monitor all project groups</p>
         </div>
-        <div class="flex space-x-3 stagger-fade-in">
-            <button onclick="toggleAdvancedFilters()" class="btn btn-secondary flex items-center space-x-2 hover-fade">
+        <div class="flex space-x-3">
+            <button onclick="toggleAdvancedFilters()" class="btn btn-secondary flex items-center space-x-2">
                 <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 01-.707.293l-6.586-6.586a1 1 0 01-.293-.707V5a1 1 0 011-1H6a1 1 0 011-1V4z"/>
                 </svg>
                 <span>Advanced Filters</span>
             </button>
-            <button class="btn btn-secondary flex items-center space-x-2 hover-fade">
+            <button class="btn btn-secondary flex items-center space-x-2">
                 <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 <span>Export</span>
             </button>
-            <button onclick="openCreateModal()" class="btn btn-primary flex items-center space-x-2 hover-fade">
+            <button onclick="openCreateModal()" class="btn btn-primary flex items-center space-x-2">
                 <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -33,7 +33,7 @@
     </div>
 
     <!-- Advanced Filters -->
-    <div id="advanced-filters" class="hidden bg-white rounded-lg shadow p-6 slide-down">
+    <div id="advanced-filters" class="hidden bg-white rounded-lg shadow p-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="form-label">Status</label>
@@ -83,7 +83,7 @@
     </div>
 
     <!-- Search and View Controls -->
-    <div class="bg-white rounded-lg shadow p-4 fade-in scale-in" style="animation-delay: 0.2s">
+    <div class="bg-white rounded-lg shadow p-4">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div class="flex items-center space-x-4">
                 <div class="relative">
@@ -101,12 +101,12 @@
                 </select>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="setViewMode('grid')" class="p-2 rounded-lg bg-blue-100 text-blue-600 hover-fade">
+                <button onclick="setViewMode('grid')" class="p-2 rounded-lg bg-blue-100 text-blue-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                     </svg>
                 </button>
-                <button onclick="setViewMode('list')" class="p-2 rounded-lg hover:bg-gray-100 hover-fade">
+                <button onclick="setViewMode('list')" class="p-2 rounded-lg hover:bg-gray-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
@@ -116,7 +116,7 @@
     </div>
 
     <!-- Groups Grid View -->
-    <div id="groups-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-fade-in">
+    <div id="groups-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Group Card 1 -->
         <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow hover-scale">
             <div class="p-6">
@@ -428,7 +428,7 @@
 
 <!-- Create Group Modal -->
 <div id="create-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 scale-in">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
         <div class="p-6 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Create New Group</h3>
         </div>

@@ -3,12 +3,12 @@
 @section('title', 'Login - GPTFMS')
 
 @section('content')
-<div class="h-screen flex items-center justify-center bg-gray-50 px-4">
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
     <div class="w-full max-w-md">
         <!-- Login Card -->
-        <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 form-container fade-in scale-in">
+        <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 form-container">
             <!-- Header -->
-            <div class="text-center mb-8 fade-in-slow">
+            <div class="text-center mb-8">
                 <div class="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
                     <span class="text-white font-bold text-xl">G</span>
                 </div>
@@ -17,7 +17,7 @@
                 </h2>
                 <p class="text-sm text-gray-600">
                     Or
-                    <a href="#" onclick="toggleRegister()" class="font-medium text-blue-600 hover:text-blue-500 hover-fade">
+                    <a href="/register" class="font-medium text-blue-600 hover:text-blue-500">
                         create a new account
                     </a>
                 </p>
@@ -29,7 +29,7 @@
             <input type="hidden" name="form_type" value="login">
             
             @if ($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
                     <div class="text-sm">
                         @foreach ($errors->all() as $error)
                             <p>{{ $error }}</p>
@@ -37,6 +37,21 @@
                     </div>
                 </div>
             @endif
+            
+            @if(session('error'))
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                    <div class="text-sm">
+                        <p>{{ session('error') }}</p>
+                    </div>
+                </div>
+            @endif
+            
+            <!-- Client-side validation message -->
+            <div id="validation-message" class="hidden bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg mb-4">
+                <div class="text-sm">
+                    <p id="validation-text"></p>
+                </div>
+            </div>
 
             <div class="space-y-4">
                 <!-- Email -->
@@ -96,13 +111,14 @@
 
                 <!-- Submit Button -->
                 <div>
-                    <button type="button" onclick="submitLoginForm()" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <button type="submit" onclick="submitLoginForm()" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105">
                         <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                            <svg class="h-5 w-5 text-blue-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-5 w-5 text-blue-500 group-hover:text-blue-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                             </svg>
                         </span>
                         Sign in
+                    </button>
                     </button>
                 </div>
             </div>
@@ -287,6 +303,27 @@ function submitLoginForm() {
     const password = document.getElementById('password').value;
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     
+    // Clear all existing error messages
+    const validationMessage = document.getElementById('validation-message');
+    const validationText = document.getElementById('validation-text');
+    if (validationMessage && validationText) {
+        validationMessage.classList.add('hidden');
+        validationText.textContent = '';
+    }
+    
+    // Clear any server error messages (both validation and flash messages)
+    const serverErrors = document.querySelectorAll('.bg-red-50');
+    serverErrors.forEach(error => error.remove());
+    
+    // Validate required fields before submission
+    if (!email || !password) {
+        if (validationMessage && validationText) {
+            validationMessage.classList.remove('hidden');
+            validationText.textContent = 'Please fill in all required fields.';
+        }
+        return;
+    }
+    
     // Create form data
     const formData = new FormData();
     formData.append('_token', csrfToken);
@@ -306,21 +343,40 @@ function submitLoginForm() {
             // Login successful, redirect to dashboard
             window.location.href = '/dashboard';
         } else if (response.redirected) {
-            // Handle redirect
+            // Handle redirect from server
             window.location.href = response.url;
         } else {
             // Handle error response
-            return response.text();
-        }
-    }).then(html => {
-        if (html) {
-            // If we get HTML back, it means there was an error
-            document.documentElement.innerHTML = html;
+            response.json().then(data => {
+                if (data.errors) {
+                    // Display server validation errors
+                    let errorHtml = '<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4"><div class="text-sm">';
+                    for (const [field, messages] of Object.entries(data.errors)) {
+                        errorHtml += `<p>${messages.join(', ')}</p>`;
+                    }
+                    errorHtml += '</div></div>';
+                    
+                    // Insert error HTML before the form
+                    const form = document.querySelector('.max-w-md:first-child');
+                    form.insertAdjacentHTML('beforebegin', errorHtml);
+                    
+                    // Scroll to top to show errors
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
         }
     }).catch(error => {
         console.error('Login error:', error);
-        // Show error message
-        alert('Login failed. Please try again.');
+        // Only show error for actual network issues, not for server responses
+        if (error.name !== 'AbortError' && error.name !== 'TypeError') {
+            const validationMessage = document.getElementById('validation-message');
+            const validationText = document.getElementById('validation-text');
+            
+            if (validationMessage && validationText) {
+                validationMessage.classList.remove('hidden');
+                validationText.textContent = 'Network error. Please try again.';
+            }
+        }
     });
 }
 
