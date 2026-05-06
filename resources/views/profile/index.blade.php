@@ -4,6 +4,37 @@
 
 @section('content')
 <div class="space-y-6">
+    <!-- Success Messages -->
+    @if(session('success'))
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-green-700">{{ session('success') }}</span>
+            </div>
+        </div>
+    @endif
+
+    <!-- Error Messages -->
+    @if($errors->any())
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                <div>
+                    <span class="text-red-700 font-medium">Please fix the following errors:</span>
+                    <ul class="text-red-600 text-sm mt-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Page Header -->
     <div class="flex justify-between items-center">
         <div>
@@ -11,13 +42,13 @@
             <p class="text-gray-500">Manage your personal information and preferences</p>
         </div>
         <div class="flex space-x-3">
-            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+            <button onclick="exportProfile()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                 </svg>
                 <span>Export Profile</span>
             </button>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+            <button type="submit" form="profileForm" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -40,13 +71,13 @@
                             </svg>
                         </button>
                     </div>
-                    <h2 class="mt-4 text-xl font-semibold text-gray-900">{{ session('user.name') ?? 'User Name' }}</h2>
-                    <p class="text-sm text-gray-500">{{ session('user.email') ?? 'user@example.com' }}</p>
+                    <h2 class="mt-4 text-xl font-semibold text-gray-900">{{ $user->name ?? 'User Name' }}</h2>
+                    <p class="text-sm text-gray-500">{{ $user->email ?? 'user@example.com' }}</p>
                     <div class="mt-4 flex items-center justify-center space-x-2">
-                        @if(session('user.role'))
-                            @if(session('user.role') === 'admin')
+                        @if($user->roles->isNotEmpty())
+                            @if($user->roles->first()->name === 'admin')
                                 <span class="px-3 py-1 text-sm font-medium bg-purple-100 text-purple-800 rounded">Admin</span>
-                            @elseif(session('user.role') === 'supervisor')
+                            @elseif($user->roles->first()->name === 'supervisor')
                                 <span class="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded">Supervisor</span>
                             @else
                                 <span class="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded">Student</span>
@@ -102,20 +133,126 @@
                 </div>
             </div>
 
-            <!-- Skills -->
-            <div class="bg-white rounded-lg shadow p-6 mt-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Skills & Expertise</h3>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">JavaScript</span>
-                    <span class="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-full">React</span>
-                    <span class="px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded-full">Node.js</span>
-                    <span class="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full">Python</span>
-                    <span class="px-3 py-1 text-sm bg-red-100 text-red-800 rounded-full">TypeScript</span>
-                    <span class="px-3 py-1 text-sm bg-indigo-100 text-indigo-800 rounded-full">MongoDB</span>
-                    <span class="px-3 py-1 text-sm bg-pink-100 text-pink-800 rounded-full">Docker</span>
-                    <span class="px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded-full">Git</span>
+            <!-- Additional Profile Information -->
+            @if($skillsData)
+                <div class="bg-white rounded-lg shadow p-6 mt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Skills Survey Information</h3>
+                        <button onclick="editSkillsSurvey()" class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 flex items-center space-x-1">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            <span class="whitespace-nowrap">Edit Survey</span>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-900 mb-2">Experience Level</h4>
+                            <span class="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">{{ ucfirst($skillsData->experience_level) }}</span>
+                        </div>
+                        
+                        @if($skillsData->skills)
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Technical Skills</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    @php
+                                        $skills = is_string($skillsData->skills) ? json_decode($skillsData->skills, true) : $skillsData->skills;
+                                        $skills = is_array($skills) ? $skills : [];
+                                    @endphp
+                                    @foreach($skills as $skill)
+                                        <span class="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-full">{{ ucfirst($skill) }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($skillsData->interests)
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Areas of Interest</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    @php
+                                        $interests = is_string($skillsData->interests) ? json_decode($skillsData->interests, true) : $skillsData->interests;
+                                        $interests = is_array($interests) ? $interests : [];
+                                    @endphp
+                                    @foreach($interests as $interest)
+                                        <span class="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full">{{ ucfirst(str_replace('_', ' ', $interest)) }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($skillsData->project_type)
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Project Preferences</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <span class="text-gray-600">Preferred Project Type:</span>
+                                        <span class="font-medium">{{ ucfirst($skillsData->project_type) }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Project Duration:</span>
+                                        <span class="font-medium">{{ ucfirst($skillsData->project_duration) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($skillsData->goals)
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Goals</h4>
+                                <p class="text-gray-700">{{ $skillsData->goals }}</p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
-            </div>
+            @endif
+            
+            @if($profileData)
+                <div class="bg-white rounded-lg shadow p-6 mt-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Supervisor Profile Information</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-900 mb-2">Department</h4>
+                            <span class="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">{{ $profileData->department }}</span>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-900 mb-2">Position</h4>
+                            <span class="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-full">{{ $profileData->position }}</span>
+                        </div>
+                        
+                        @if($profileData->specializations)
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Specializations</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($profileData->specializations as $specialization)
+                                        <span class="px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded-full">{{ $specialization }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($profileData->preferences)
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Project Preferences</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($profileData->preferences as $preference)
+                                        @if(is_array($preference))
+                                            @if(isset($preference['name']))
+                                                <span class="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full">{{ $preference['name'] }}</span>
+                                            @elseif(isset($preference[0]))
+                                                <span class="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full">{{ $preference[0] }}</span>
+                                            @endif
+                                        @else
+                                            <span class="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full">{{ $preference }}</span>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Profile Details -->
@@ -126,46 +263,53 @@
                     <h3 class="text-lg font-semibold text-gray-900">Personal Information</h3>
                 </div>
                 <div class="p-6">
-                    <form class="space-y-6">
+                    <form action="{{ route('profile.update') }}" method="POST" class="space-y-6" id="profileForm">
+                        @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                                <input type="text" value="John" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="text" name="first_name" value="{{ $user->first_name ?? '' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                @error('first_name')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                                <input type="text" value="Doe" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="text" name="last_name" value="{{ $user->last_name ?? '' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                @error('last_name')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                            <input type="email" value="john.doe@university.edu" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="email" name="email" value="{{ $user->email ?? '' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
+                            @error('email')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                            <input type="tel" value="+1 (555) 123-4567" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="tel" name="phone" value="{{ $user->phone ?? '' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('phone')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                            <textarea rows="4" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tell us about yourself...">Experienced software developer with a passion for building scalable web applications. Specialized in React, Node.js, and cloud technologies.</textarea>
+                            <textarea name="bio" rows="4" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tell us about yourself...">{{ $user->bio ?? '' }}</textarea>
+                            @error('bio')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
-                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option>Computer Science</option>
-                                    <option>Engineering</option>
-                                    <option>Business</option>
-                                    <option>Mathematics</option>
-                                </select>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Registration Number</label>
+                                <input type="text" name="registration_number" value="{{ $user->registration_number ?? '' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option>Admin</option>
-                                    <option>Supervisor</option>
-                                    <option>Student</option>
-                                </select>
+                                <input type="text" name="role" value="{{ $user->roles->first()->name ?? '' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
                             </div>
                         </div>
                     </form>
@@ -295,4 +439,76 @@
         </div>
     </div>
 </div>
+
+<script>
+function editSkillsSurvey() {
+    // Redirect to the survey page for editing
+    window.location.href = '/survey';
+}
+
+function exportProfile() {
+    // Show loading state
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Exporting...';
+    button.disabled = true;
+    
+    // Fetch the profile data
+    fetch('/profile/export', {
+        method: 'GET',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Export failed');
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `profile_${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        // Show success message
+        showNotification('Profile exported successfully as PDF!', 'success');
+    })
+    .catch(error => {
+        console.error('Export error:', error);
+        showNotification('Failed to export profile', 'error');
+    })
+    .finally(() => {
+        // Restore button
+        button.innerHTML = originalContent;
+        button.disabled = false;
+    });
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500 text-white' :
+        type === 'error' ? 'bg-red-500 text-white' :
+        'bg-blue-500 text-white'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
+
 @endsection

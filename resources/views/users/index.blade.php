@@ -12,74 +12,74 @@
         </div>
         <div class="flex space-x-3">
             <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                 </svg>
-                <span>Export Users</span>
+                <span class="whitespace-nowrap">Export Users</span>
             </button>
             <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                 </svg>
-                <span>Add User</span>
+                <span class="whitespace-nowrap">Add User</span>
             </button>
         </div>
     </div>
 
     <!-- User Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center justify-between">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Users</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $users->count() }}</p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $users->count() }}</p>
                     <p class="text-xs text-green-600 mt-1">Registered users</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center justify-between">
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Active Users</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $users->where('status', 'active')->count() }}</p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $users->where('status', 'active')->count() }}</p>
                     <p class="text-xs text-green-600 mt-1">{{ $users->count() > 0 ? round(($users->where('status', 'active')->count() / $users->count()) * 100) : 0 }}% active rate</p>
                 </div>
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center justify-between">
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Admin Users</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $users->filter(function($user) { return $user->hasRole('admin'); })->count() }}</p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $users->filter(function($user) { return $user->hasRole('admin'); })->count() }}</p>
                     <p class="text-xs text-gray-500 mt-1">System administrators</p>
                 </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h6m2 5h6a2 2 0 012 2v-1a2 2 0 01-2 2h-3m-6 0a2 2 0 00-2 2v-1a2 2 0 012 2z"/>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center justify-between">
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Students</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $users->filter(function($user) { return $user->hasRole('student'); })->count() }}</p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $users->filter(function($user) { return $user->hasRole('student'); })->count() }}</p>
                     <p class="text-xs text-blue-600 mt-1">Student accounts</p>
                 </div>
-                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3h6m-6 3a2 2 0 00-2 2v3m0 0h6v-3m-6 3a2 2 0 00-2 2v-3m0 0h6v3"/>
                     </svg>
                 </div>
             </div>
@@ -91,25 +91,25 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div class="flex items-center space-x-4">
                 <div class="relative">
-                    <input type="text" placeholder="Search users..." 
+                    <input type="text" id="searchInput" placeholder="Search users..." 
                            class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </div>
-                <select class="border border-gray-300 rounded-lg px-3 py-2">
+                <select id="roleFilter" class="border border-gray-300 rounded-lg px-3 py-2">
                     <option value="all">All Roles</option>
                     <option value="admin">Admin</option>
                     <option value="supervisor">Supervisor</option>
                     <option value="student">Student</option>
                 </select>
-                <select class="border border-gray-300 rounded-lg px-3 py-2">
+                <select id="statusFilter" class="border border-gray-300 rounded-lg px-3 py-2">
                     <option value="all">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                     <option value="suspended">Suspended</option>
                 </select>
-                <select class="border border-gray-300 rounded-lg px-3 py-2">
+                <select id="departmentFilter" class="border border-gray-300 rounded-lg px-3 py-2">
                     <option value="all">All Departments</option>
                     <option value="cs">Computer Science</option>
                     <option value="eng">Engineering</option>
@@ -117,33 +117,33 @@
                 </select>
             </div>
             <div class="flex items-center space-x-2">
-                <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button id="gridViewBtn" onclick="toggleView('grid')" class="px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 01-.707.293l-6.586-6.586a1 1 0 01-.293-.707V5a1 1 0 011-1H6a1 1 0 011-1V4z"/>
                     </svg>
-                    <span>Grid View</span>
+                    <span class="whitespace-nowrap">Grid View</span>
                 </button>
-                <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button id="listViewBtn" onclick="toggleView('list')" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
-                    <span>List View</span>
+                    <span class="whitespace-nowrap">List View</span>
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Users Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="usersGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         @forelse ($users as $user)
             <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-                <div class="p-6">
-                    <div class="flex items-center space-x-4 mb-4">
-                        <img src="https://picsum.photos/seed/{{ $user->email }}/64/64.jpg" alt="{{ $user->name }}" class="w-16 h-16 rounded-full">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h3>
+                <div class="p-4 sm:p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-3 sm:space-y-0 mb-4">
+                        <img src="https://picsum.photos/seed/{{ $user->email }}/64/64.jpg" alt="{{ $user->name }}" class="w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto sm:mx-0">
+                        <div class="text-center sm:text-left flex-1">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-1">{{ $user->name }}</h3>
                             <p class="text-sm text-gray-500">{{ $user->email }}</p>
-                            <div class="flex items-center space-x-2 mt-1">
+                            <div class="flex flex-wrap justify-center sm:justify-start items-center gap-2 mt-2">
                                 @if ($user->hasRole('admin'))
                                     <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded">Admin</span>
                                 @elseif ($user->hasRole('supervisor'))
@@ -163,50 +163,123 @@
                         </div>
                     </div>
                     
-                    <div class="space-y-3">
+                    <div class="space-y-2 sm:space-y-3">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Phone</span>
-                            <span class="font-medium">{{ $user->phone ?? 'Not provided' }}</span>
+                            <span class="font-medium text-xs sm:text-sm">{{ $user->phone ?? 'Not provided' }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Groups</span>
-                            <span class="font-medium">{{ $user->groupMemberships()->count() }} groups</span>
+                            <span class="font-medium text-xs sm:text-sm">{{ $user->groupMemberships()->count() }} groups</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Last Active</span>
-                            <span class="font-medium">{{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Never' }}</span>
+                            <span class="font-medium text-xs sm:text-sm">{{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Never' }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Joined</span>
-                            <span class="font-medium">{{ $user->created_at->format('M d, Y') }}</span>
+                            <span class="font-medium text-xs sm:text-sm">{{ $user->created_at->format('M d, Y') }}</span>
                         </div>
                     </div>
                     
-                    <div class="flex space-x-2 mt-4">
-                        <button onclick="viewUser({{ $user->id }})" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">View</button>
-                        <button onclick="editUser({{ $user->id }})" class="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">Edit</button>
-                        <button onclick="deleteUser({{ $user->id }}, '{{ $user->name }}')" class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                        </button>
+                    <div class="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 mt-4">
+                        <a href="{{ route('users.show', $user->id) }}" class="flex-1 px-2 sm:px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm text-center">View</a>
+                        <a href="{{ route('users.edit', $user->id) }}" class="flex-1 px-2 sm:px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm text-center">Edit</a>
+                        <form action="{{ route('users.delete', $user->id) }}" method="POST" onsubmit="return confirmDelete('{{ $user->name }}')" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="px-2 sm:px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1 1h-4a1 1 0 00-1 1v3m0 0h6v-1a1 1 0 001 1m-6 0h6"/>
+                                </svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         @empty
             <div class="col-span-full">
-                <div class="bg-white rounded-lg shadow p-8 text-center">
-                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-lg shadow p-6 sm:p-8 text-center">
+                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No users found</h3>
-                    <p class="text-gray-500">Get started by adding your first user.</p>
-                    <button onclick="addUser()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Add User
-                    </button>
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-2">No users found</h3>
+                    <p class="text-sm text-gray-500">Try adjusting your search criteria or filters</p>
                 </div>
             </div>
         @endforelse
+    </div>
+
+    <!-- Users List (hidden by default) -->
+    <div id="usersList" class="hidden">
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse ($users as $user)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <img src="https://picsum.photos/seed/{{ $user->email }}/40/40.jpg" alt="{{ $user->name }}" class="w-10 h-10 rounded-full mr-3">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
+                                            <div class="text-sm text-gray-500">{{ $user->email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if ($user->hasRole('admin'))
+                                        <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded">Admin</span>
+                                    @elseif ($user->hasRole('supervisor'))
+                                        <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">Supervisor</span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Student</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if ($user->status === 'active')
+                                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Active</span>
+                                    @elseif ($user->status === 'inactive')
+                                        <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded">Inactive</span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded">Suspended</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ $user->registration_number }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-2">
+                                        <a href="{{ route('users.show', $user->id) }}" class="text-blue-600 hover:text-blue-900">View</a>
+                                        <a href="{{ route('users.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                        <form action="{{ route('users.delete', $user->id) }}" method="POST" onsubmit="return confirmDelete('{{ $user->name }}')" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    No users found. Try adjusting your search criteria or filters.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Pagination -->
@@ -234,6 +307,107 @@
 </div>
 
 <script>
+// View toggle functionality
+function toggleView(viewType) {
+    const gridView = document.getElementById('usersGrid');
+    const listView = document.getElementById('usersList');
+    const gridBtn = document.getElementById('gridViewBtn');
+    const listBtn = document.getElementById('listViewBtn');
+    
+    if (viewType === 'grid') {
+        // Show grid view
+        gridView.classList.remove('hidden');
+        listView.classList.add('hidden');
+        
+        // Update button styles
+        gridBtn.classList.remove('bg-white', 'border-gray-300');
+        gridBtn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+        listBtn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+        listBtn.classList.add('bg-white', 'border-gray-300');
+        
+        // Save preference
+        localStorage.setItem('usersViewPreference', 'grid');
+    } else if (viewType === 'list') {
+        // Show list view
+        gridView.classList.add('hidden');
+        listView.classList.remove('hidden');
+        
+        // Update button styles
+        listBtn.classList.remove('bg-white', 'border-gray-300');
+        listBtn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+        gridBtn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+        gridBtn.classList.add('bg-white', 'border-gray-300');
+        
+        // Save preference
+        localStorage.setItem('usersViewPreference', 'list');
+    }
+}
+
+// Initialize view preference on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const savedPreference = localStorage.getItem('usersViewPreference');
+    if (savedPreference === 'list') {
+        toggleView('list');
+    } else {
+        toggleView('grid');
+    }
+});
+
+// Filter functionality
+function applyFilters() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const roleFilter = document.getElementById('roleFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    const departmentFilter = document.getElementById('departmentFilter').value;
+    
+    const userCards = document.querySelectorAll('#usersGrid .bg-white');
+    const userRows = document.querySelectorAll('#usersList tbody tr');
+    
+    // Filter grid view
+    userCards.forEach(card => {
+        const userName = card.querySelector('h3')?.textContent.toLowerCase() || '';
+        const userEmail = card.querySelector('p')?.textContent.toLowerCase() || '';
+        const userRole = card.querySelector('.px-2.py-1')?.textContent.toLowerCase() || '';
+        const userStatus = card.querySelectorAll('.px-2.py-1')[1]?.textContent.toLowerCase() || '';
+        
+        const matchesSearch = userName.includes(searchTerm) || userEmail.includes(searchTerm);
+        const matchesRole = roleFilter === 'all' || userRole.includes(roleFilter.toLowerCase());
+        const matchesStatus = statusFilter === 'all' || userStatus.includes(statusFilter.toLowerCase());
+        const matchesDepartment = departmentFilter === 'all' || true; // Department filter to be implemented
+        
+        if (matchesSearch && matchesRole && matchesStatus && matchesDepartment) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Filter list view
+    userRows.forEach(row => {
+        const userName = row.querySelector('.text-sm.font-medium')?.textContent.toLowerCase() || '';
+        const userEmail = row.querySelector('.text-sm.text-gray-500')?.textContent.toLowerCase() || '';
+        const userRole = row.querySelector('td:nth-child(2) .px-2.py-1')?.textContent.toLowerCase() || '';
+        const userStatus = row.querySelector('td:nth-child(3) .px-2.py-1')?.textContent.toLowerCase() || '';
+        
+        const matchesSearch = userName.includes(searchTerm) || userEmail.includes(searchTerm);
+        const matchesRole = roleFilter === 'all' || userRole.includes(roleFilter.toLowerCase());
+        const matchesStatus = statusFilter === 'all' || userStatus.includes(statusFilter.toLowerCase());
+        const matchesDepartment = departmentFilter === 'all' || true; // Department filter to be implemented
+        
+        if (matchesSearch && matchesRole && matchesStatus && matchesDepartment) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Real-time search
+document.getElementById('searchInput')?.addEventListener('input', applyFilters);
+document.getElementById('roleFilter')?.addEventListener('change', applyFilters);
+document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
+document.getElementById('departmentFilter')?.addEventListener('change', applyFilters);
+
 // User management functions
 function viewUser(userId) {
     // Navigate to user detail page or show modal
@@ -368,6 +542,11 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
         notification.remove();
     }, 3000);
+}
+
+// Delete confirmation function
+function confirmDelete(userName) {
+    return confirm('Are you sure you want to delete the user "' + userName + '"? This action cannot be undone.');
 }
 </script>
 @endsection

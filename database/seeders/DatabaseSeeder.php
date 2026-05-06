@@ -48,6 +48,9 @@ class DatabaseSeeder extends Seeder
         // Seed users
         $this->seedUsers();
 
+        // Seed Tanzanian sample data
+        $this->call(CreateTanzanianSampleData::class);
+
         // Seed groups
         $this->seedGroups();
 

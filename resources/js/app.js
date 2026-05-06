@@ -542,20 +542,72 @@ function initializePageTransitions() {
     // Page transitions disabled - only content area should fade
 }
 
+// Groups dropdown toggle function
+function toggleGroupsDropdown() {
+    const dropdown = document.getElementById('groups-dropdown');
+    const chevron = document.getElementById('groups-chevron');
+    
+    if (dropdown && chevron) {
+        const isHidden = !dropdown.classList.contains('show');
+        
+        // Close all other dropdowns first
+        closeAllDropdowns();
+        
+        // If it was hidden, open this one
+        if (isHidden) {
+            dropdown.classList.add('show');
+            chevron.classList.add('rotate-180');
+            console.log('Groups dropdown opened');
+        } else {
+            dropdown.classList.remove('show');
+            chevron.classList.remove('rotate-180');
+            console.log('Groups dropdown closed');
+        }
+    } else {
+        console.error('Groups dropdown elements not found:', {
+            dropdown: !!dropdown,
+            chevron: !!chevron
+        });
+    }
+}
+
 // Close all dropdowns function
 function closeAllDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown-menu');
     const chevrons = document.querySelectorAll('[id$="-chevron"]');
     
     dropdowns.forEach(dropdown => {
-        dropdown.classList.add('hidden');
-        dropdown.classList.remove('dropdown-enter');
+        dropdown.classList.remove('show');
     });
     
     chevrons.forEach(chevron => {
         chevron.classList.remove('rotate-180');
     });
 }
+
+// Auto-hide dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const groupsDropdown = document.getElementById('groups-dropdown');
+    const groupsButton = event.target.closest('.nav-item');
+    
+    if (groupsDropdown && !groupsButton) {
+        closeAllDropdowns();
+    }
+});
+
+// Auto-hide dropdown when clicking other menu items
+document.addEventListener('click', function(event) {
+    const clickedLink = event.target.closest('a');
+    const groupsDropdown = document.getElementById('groups-dropdown');
+    
+    if (clickedLink && groupsDropdown && !clickedLink.closest('#groups-dropdown')) {
+        // Don't hide if clicking within the dropdown
+        if (!clickedLink.closest('.dropdown-menu')) {
+            closeAllDropdowns();
+        }
+    }
+});
+
 
 // Fallback profile dropdown function
 function toggleProfileDropdown() {
@@ -597,6 +649,20 @@ function toggleProfileDropdown() {
     }
 }
 
+// Navigate to page with fade transition
+function navigateToPage(url) {
+    if (!url) return;
+    
+    // Add fade out effect
+    document.body.style.opacity = '0';
+    document.body.style.transition = 'opacity 0.3s ease-in-out';
+    
+    // Navigate after transition
+    setTimeout(() => {
+        window.location.href = url;
+    }, 300);
+}
+
 // Export functions for global use
 window.GPTFMS = {
     showNotification,
@@ -613,5 +679,7 @@ window.GPTFMS = {
     initializeNotifications,
     initializeTheme,
     navigateToPage,
-    initializePageTransitions
+    initializePageTransitions,
+    toggleGroupsDropdown,
+    closeAllDropdowns
 };

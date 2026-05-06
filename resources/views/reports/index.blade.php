@@ -397,11 +397,106 @@ function closeGenerateModal() {
     document.getElementById('generate-modal').classList.add('hidden');
 }
 
+// Generate report function
+function generateReport() {
+    const reportType = document.querySelector('select[name="report_type"]').value;
+    const reportPeriod = document.querySelector('select[name="report_period"]').value;
+    const format = document.querySelector('input[name="format"]:checked').value;
+    const email = document.querySelector('input[type="email"]').value;
+    
+    if (!reportType || reportType === 'Select report type') {
+        showNotification('Please select a report type', 'error');
+        return;
+    }
+    
+    // Show loading state
+    const generateBtn = document.querySelector('button[onclick="generateReport()"]');
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m0 0l3 9m-3-9v12m0 0l-3-9m3 9H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Generating...';
+    
+    // Simulate report generation
+    setTimeout(() => {
+        // Here you would normally make an AJAX call to the server
+        // For demo purposes, we'll simulate the generation
+        console.log('Generating report:', {
+            type: reportType,
+            period: reportPeriod,
+            format: format,
+            email: email
+        });
+        
+        // Reset button
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = 'Generate Report';
+        
+        // Show success message
+        showNotification(`Report "${reportType}" generated successfully!`, 'success');
+        
+        // Close modal
+        closeGenerateModal();
+        
+        // In a real implementation, you would redirect or download the file
+        if (format === 'pdf') {
+            console.log('Downloading PDF report...');
+        } else if (format === 'excel') {
+            console.log('Downloading Excel report...');
+        } else if (format === 'csv') {
+            console.log('Downloading CSV report...');
+        }
+        
+    }, 2000);
+}
+
+function scheduleReport() {
+    openGenerateModal();
+    // Pre-select scheduling options
+    const reportType = document.querySelector('select[name="report_type"]');
+    if (reportType) {
+        reportType.value = 'scheduled_report';
+    }
+}
+
+function downloadReport(reportId) {
+    console.log('Downloading report:', reportId);
+    showNotification('Report download started...', 'info');
+    
+    // In a real implementation, this would trigger a file download
+    setTimeout(() => {
+        showNotification('Report downloaded successfully!', 'success');
+    }, 1000);
+}
+
+function deleteReport(reportId) {
+    if (confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+        console.log('Deleting report:', reportId);
+        showNotification('Report deleted successfully!', 'success');
+        
+        // In a real implementation, this would make an API call to delete the report
+        // Then remove the row from the table
+        const row = document.querySelector(`[data-report-id="${reportId}"]`);
+        if (row) {
+            row.remove();
+        }
+    }
+}
+
 // Close modal when clicking outside
 document.getElementById('generate-modal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeGenerateModal();
     }
+});
+
+// Add click handlers to report cards
+document.addEventListener('DOMContentLoaded', function() {
+    const reportCards = document.querySelectorAll('.cursor-pointer');
+    reportCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Handle click on report cards
+            const reportTitle = this.querySelector('h3')?.textContent;
+            console.log('Report card clicked:', reportTitle);
+        });
+    });
 });
 </script>
 @endsection

@@ -55,7 +55,7 @@
     }
     
     .sidebar-dropdown {
-        @apply w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-800 transition-colors text-gray-300 hover:text-white;
+        @apply w-full flex items-center justify-between p-3 rounded-lg transition-colors text-gray-300;
     }
     
     .sidebar-dropdown.active {
@@ -63,15 +63,23 @@
     }
     
     .sidebar-dropdown-item {
-        @apply block px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded transition-colors;
+        @apply block px-3 py-2 text-sm text-gray-300 rounded transition-colors;
     }
     
     .dropdown-menu {
-        @apply absolute bg-gray-800 rounded-lg shadow-lg p-2 hidden z-50;
+        @apply absolute bg-gray-800 rounded-lg shadow-lg p-2 z-50;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out, transform 0.2s ease-in-out;
+        display: none;
     }
     
     .dropdown-menu.show {
-        @apply block;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        display: block;
     }
     
     /* All fade animations removed */
@@ -175,6 +183,138 @@ header button[onclick="toggleSidebar()"]:hover svg {
     transform: scale(1.1);
 }
 
+/* Chevron rotation on hover */
+.group:hover #groups-chevron {
+    transform: rotate(180deg);
+}
+
+/* Groups dropdown - click-based only */
+#groups-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Clean dropdown positioning */
+#groups-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    min-width: 200px;
+    margin-top: 8px;
+}
+
+/* Ensure dropdown container has proper positioning */
+.sidebar-dropdown {
+    position: relative;
+}
+
+/* Ensure dropdown doesn't overlap with sidebar positioning */
+.sidebar-nav {
+    position: relative;
+    overflow: visible;
+}
+
+/* Modern navigation items */
+.nav-item {
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-item:hover {
+    transform: translateX(4px);
+}
+
+.icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-item:hover .icon-wrapper {
+    background: rgba(59, 130, 246, 0.2);
+    transform: scale(1.1);
+}
+
+/* Navigation badges */
+.nav-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    transition: all 0.2s ease-in-out;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.badge-info {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+/* Enhanced hover states */
+.nav-item:hover .nav-badge {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Tooltip styles */
+.nav-item[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 100%;
+    bottom: -30px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.nav-item[title]:hover::after {
+    opacity: 1;
+    transform: translateY(-5px);
+}
+
 /* Groups dropdown improvements */
 #groups-dropdown {
     min-width: 192px;
@@ -201,35 +341,16 @@ header button[onclick="toggleSidebar()"]:hover svg {
     border-radius: 0.375rem;
 }
 
-.sidebar-dropdown-item:hover {
-    transform: translateX(4px);
-    background-color: rgba(59, 130, 246, 0.1);
-    color: white;
-}
 
-/* Hover-based dropdown for Groups menu */
-.group:hover .dropdown-menu,
-.dropdown-menu:hover {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.sidebar-dropdown-item:hover {
-    background-color: rgba(59, 130, 246, 0.1);
-    transform: translateX(4px);
-}
-
-/* Chevron rotation on hover */
-.group:hover #groups-chevron {
-    transform: rotate(180deg);
-}
 
 /* Dropdown positioning fix for collapsed sidebar */
 aside.w-16 #groups-dropdown {
     left: 100%;
     top: 0;
     margin-left: 0.5rem;
+    transform: translateX(4px);
+    background-color: rgba(59, 130, 246, 0.1);
+    color: white;
 }
 
 /* Ensure dropdown stays above other elements */

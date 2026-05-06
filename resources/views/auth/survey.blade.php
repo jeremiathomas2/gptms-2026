@@ -2,6 +2,7 @@
 
 @section('title', 'Skills Survey - GPTFMS')
 
+
 @section('content')
 <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
     <div class="w-full max-w-4xl">
@@ -36,7 +37,7 @@
             <!-- Survey Form -->
             <form id="survey-form" class="space-y-8" action="/survey" method="POST">
                 @csrf
-                <input type="hidden" name="user_id" value="{{ session('user.id') ?? '' }}">
+                <input type="hidden" name="user_id" value="{{ session('user.id') ?? auth()->id() ?? '' }}">
                 
                 <!-- Technical Skills Section -->
                 <div class="bg-gray-50 rounded-lg p-6">
@@ -233,22 +234,97 @@
 </div>
 
 <script>
-// Progress tracking
-function updateProgress() {
+// Client-side form validation
+function validateSurveyForm() {
     const form = document.getElementById('survey-form');
-    const totalFields = form.querySelectorAll('input[required], select[required]').length;
-    const filledFields = form.querySelectorAll('input[required]:checked, select[required]:not([value=""])').length;
-    const progress = Math.round((filledFields / totalFields) * 100);
     
-    document.getElementById('progress-bar').style.width = progress + '%';
-    document.getElementById('progress-text').textContent = progress + '%';
+    // Check required fields
+    const experienceLevel = form.querySelector('input[name="experience_level"]:checked');
+    const projectType = form.querySelector('select[name="project_type"]');
+    const projectDuration = form.querySelector('select[name="project_duration"]');
+    
+    // Debug: Log validation state
+    console.log('Experience level checked:', experienceLevel ? experienceLevel.value : 'NONE');
+    console.log('Project type value:', projectType ? projectType.value : 'NONE');
+    console.log('Project duration value:', projectDuration ? projectDuration.value : 'NONE');
+    
+    // Additional debug: Check all experience level radio buttons
+    const allExperienceLevels = form.querySelectorAll('input[name="experience_level"]');
+    console.log('All experience level radios:', allExperienceLevels.length);
+    allExperienceLevels.forEach((radio, index) => {
+        console.log(`Radio ${index}: value=${radio.value}, checked=${radio.checked}`);
+    });
+    
+    const errors = [];
+    
+    if (!experienceLevel) {
+        errors.push('Please select your experience level.');
+    }
+    
+    if (!projectType || !projectType.value) {
+        errors.push('Please select your preferred project type.');
+    }
+    
+    if (!projectDuration || !projectDuration.value) {
+        errors.push('Please select your preferred project duration.');
+    }
+    
+    if (errors.length > 0) {
+        alert(errors.join('\n'));
+        return false;
+    }
+    
+    return true;
 }
 
-// Add event listeners for progress tracking
+// Enhanced progress tracking
+function updateProgress() {
+    const form = document.getElementById('survey-form');
+    
+    // Count all relevant fields
+    const allInputs = form.querySelectorAll('input[type="radio"], input[type="checkbox"], select, textarea');
+    const totalFields = allInputs.length;
+    
+    // Count filled/selected fields
+    let filledFields = 0;
+    
+    allInputs.forEach(input => {
+        if (input.type === 'radio' || input.type === 'checkbox') {
+            if (input.checked) filledFields++;
+        } else if (input.tagName === 'SELECT') {
+            if (input.value !== '') filledFields++;
+        } else if (input.tagName === 'TEXTAREA') {
+            if (input.value.trim() !== '') filledFields++;
+        }
+    });
+    
+    // Calculate progress
+    const progress = Math.round((filledFields / totalFields) * 100);
+    
+    // Update progress bar
+    document.getElementById('progress-bar').style.width = progress + '%';
+    document.getElementById('progress-text').textContent = progress + '%';
+    
+    // Update progress bar color based on completion
+    const progressBar = document.getElementById('progress-bar');
+    if (progress === 100) {
+        progressBar.className = 'bg-green-600 h-2 rounded-full transition-all duration-300';
+    } else if (progress >= 50) {
+        progressBar.className = 'bg-blue-600 h-2 rounded-full transition-all duration-300';
+    } else {
+        progressBar.className = 'bg-yellow-500 h-2 rounded-full transition-all duration-300';
+    }
+    
+    console.log(`Progress: ${progress}% (${filledFields}/${totalFields} fields)`);
+}
+
+// Form validation and submission
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('survey-form');
     const inputs = form.querySelectorAll('input, select, textarea');
+    const submitButton = form.querySelector('button[type="submit"]');
     
+    // Add event listeners for progress tracking
     inputs.forEach(input => {
         input.addEventListener('change', updateProgress);
         input.addEventListener('input', updateProgress);
@@ -256,6 +332,113 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initial progress update
     updateProgress();
+    
+    // Enhanced form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Use the validation function
+        if (!validateSurveyForm()) {
+            return;
+        }
+        
+        // Debug: Check user ID before submission
+        const userIdField = form.querySelector('input[name="user_id"]');
+        console.log('User ID field value:', userIdField ? userIdField.value : 'NOT FOUND');
+        
+        if (!userIdField || !userIdField.value) {
+            alert('User authentication error. Please log in again.');
+            window.location.href = '/login';
+            return;
+        }
+        
+        // Show loading state
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Submitting...
+        `;
+        submitButton.disabled = true;
+        
+        // Submit form via AJAX
+        const formData = new FormData(form);
+        
+        fetch('/survey', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': formData.get('_token'),
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                // Show success message
+                submitButton.innerHTML = `
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Completed!
+                `;
+                submitButton.className = 'px-6 py-3 bg-green-600 text-white rounded-lg flex items-center';
+                
+                // Clear saved progress
+                localStorage.removeItem('surveyProgress');
+                
+                // Redirect to dashboard after delay
+                setTimeout(() => {
+                    window.location.href = data.redirect || '/dashboard';
+                }, 1500);
+            } else {
+                throw new Error(data.message || 'Submission failed');
+            }
+        })
+        .catch(error => {
+            console.error('Survey submission error:', error);
+            
+            // Show more detailed error message
+            let errorMessage = 'There was an error submitting your survey. Please try again.';
+            if (error.message.includes('419')) {
+                errorMessage = 'CSRF token expired. Please refresh the page and try again.';
+            } else if (error.message.includes('422')) {
+                // Try to extract validation errors from the response
+                try {
+                    const errorData = JSON.parse(error.message.split('HTTP 422: ')[1]);
+                    if (errorData.errors) {
+                        const firstError = Object.values(errorData.errors)[0];
+                        errorMessage = Array.isArray(firstError) ? firstError[0] : firstError;
+                    } else {
+                        errorMessage = errorData.message || 'Please complete all required fields before submitting.';
+                    }
+                } catch (e) {
+                    errorMessage = 'Please complete all required fields before submitting. Make sure you have selected your experience level, project type, and project duration.';
+                }
+            } else if (error.message.includes('500')) {
+                errorMessage = 'Server error occurred. Please try again later.';
+            }
+            
+            alert(errorMessage);
+            
+            // Reset button
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+            submitButton.className = 'px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center';
+        });
+    });
 });
 
 // Save progress function

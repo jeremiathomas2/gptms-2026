@@ -24,6 +24,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'email',
         'password',
         'phone',
+        'gender',
         'registration_number',
         'avatar',
         'status',
@@ -68,6 +69,11 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function studentProfile(): HasOne
     {
         return $this->hasOne(StudentProfile::class);
+    }
+
+    public function supervisorProfile(): HasOne
+    {
+        return $this->hasOne(SupervisorProfile::class);
     }
 
     public function createdGroups(): HasMany

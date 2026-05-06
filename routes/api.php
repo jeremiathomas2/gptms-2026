@@ -56,7 +56,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/groups/{group}/invite', [GroupController::class, 'inviteMember']);
     Route::post('/groups/{group}/remove/{user}', [GroupController::class, 'removeMember']);
     Route::post('/groups/auto-form', [GroupController::class, 'autoFormGroups']);
-    Route::get('/groups/{group}/analytics', [GroupController::class, 'groupAnalytics']);
+    Route::middleware('role:admin,supervisor')->group(function () {
+        Route::get('/groups/{group}/analytics', [GroupController::class, 'groupAnalytics']);
+    });
     Route::post('/groups/{group}/assign-role', [GroupController::class, 'assignRole']);
 
     // Project routes
@@ -101,13 +103,15 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/peer-evaluations/received/{project}', [PeerEvaluationController::class, 'receivedEvaluations']);
     Route::post('/peer-evaluations/submit', [PeerEvaluationController::class, 'submitEvaluation']);
 
-    // Analytics routes
-    Route::get('/analytics/dashboard', [AnalyticsController::class, 'dashboard']);
-    Route::get('/analytics/group-performance', [AnalyticsController::class, 'groupPerformance']);
-    Route::get('/analytics/individual-performance', [AnalyticsController::class, 'individualPerformance']);
-    Route::get('/analytics/project-progress', [AnalyticsController::class, 'projectProgress']);
-    Route::get('/analytics/skill-distribution', [AnalyticsController::class, 'skillDistribution']);
-    Route::get('/analytics/export/{type}', [AnalyticsController::class, 'exportData']);
+    // Analytics routes (restricted to admin and supervisor)
+    Route::middleware('role:admin,supervisor')->group(function () {
+        Route::get('/analytics/dashboard', [AnalyticsController::class, 'dashboard']);
+        Route::get('/analytics/group-performance', [AnalyticsController::class, 'groupPerformance']);
+        Route::get('/analytics/individual-performance', [AnalyticsController::class, 'individualPerformance']);
+        Route::get('/analytics/project-progress', [AnalyticsController::class, 'projectProgress']);
+        Route::get('/analytics/skill-distribution', [AnalyticsController::class, 'skillDistribution']);
+        Route::get('/analytics/export/{type}', [AnalyticsController::class, 'exportData']);
+    });
 
     // Admin routes (role-based)
     Route::middleware('role:admin')->group(function () {

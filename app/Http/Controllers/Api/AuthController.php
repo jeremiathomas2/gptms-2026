@@ -21,11 +21,43 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:student,supervisor',
             'phone' => 'nullable|string|max:20',
+            'gender' => 'required|in:male,female,other',
+            'registration_number' => 'nullable|string|max:50',
         ]);
+
+        // Custom validation for unique fields
+        $validator->after(function ($validator) use ($request) {
+            // Check unique email
+            if ($request->email) {
+                $existingEmail = User::where('email', $request->email)->first();
+                if ($existingEmail) {
+                    $roleName = $request->role === 'student' ? 'Student' : 'Supervisor';
+                    $validator->errors()->add('email', $roleName . ' Already Exist');
+                }
+            }
+            
+            // Check unique phone
+            if ($request->phone) {
+                $existingPhone = User::where('phone', $request->phone)->first();
+                if ($existingPhone) {
+                    $roleName = $request->role === 'student' ? 'Student' : 'Supervisor';
+                    $validator->errors()->add('phone', $roleName . ' Already Exist');
+                }
+            }
+            
+            // Check unique registration number
+            if ($request->registration_number) {
+                $existingRegNumber = User::where('registration_number', $request->registration_number)->first();
+                if ($existingRegNumber) {
+                    $roleName = $request->role === 'student' ? 'Student' : 'Supervisor';
+                    $validator->errors()->add('registration_number', $roleName . ' Already Exist');
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -37,6 +69,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
+            'gender' => $request->gender,
         ]);
 
         // Assign role
@@ -50,6 +83,7 @@ class AuthController extends Controller
                 'semester' => 1,
                 'total_projects' => 0,
                 'average_rating' => 0.00,
+                'gender' => $request->gender,
             ]);
         }
 
