@@ -158,8 +158,8 @@
                                     <h4 class="font-medium text-gray-900">{{ $group->name }}</h4>
                                     <p class="text-sm text-gray-500">{{ $group->description }}</p>
                                     <p class="text-xs text-gray-400 mt-1">
-                                        {{ $group->members->count() }} member(s) • 
-                                        {{ $group->projects->count() }} project(s)
+                                        {{ $group->members ? $group->members->count() : 0 }} member(s) • 
+                                        {{ $group->projects ? $group->projects->count() : 0 }} project(s)
                                     </p>
                                 </div>
                                 <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">

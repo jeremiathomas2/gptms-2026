@@ -555,11 +555,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Admin logs and monitoring
     Route::get('/admin/logs', function () {
-        // Get recent activity logs
-        $logs = \App\Models\ActivityLog::with('user')
-            ->orderBy('created_at', 'desc')
-            ->take(100)
-            ->get();
+        // Get recent activity logs with enhanced filtering
+        $logs = \App\Services\ActivityLogger::getRecentActivities(100);
         
         return view('admin.logs', compact('logs'));
     })->name('admin.logs');
@@ -569,6 +566,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/group-settings', [App\Http\Controllers\Admin\GroupSettingsController::class, 'update'])->name('admin.group-settings.update');
     Route::post('/admin/create-groups', [App\Http\Controllers\Admin\GroupSettingsController::class, 'createGroups'])->name('admin.create-groups');
     Route::get('/admin/countdown-status', [App\Http\Controllers\Admin\GroupSettingsController::class, 'countdownStatus'])->name('admin.countdown-status');
+    
+    // Admin groups management
+    Route::get('/admin/groups', [App\Http\Controllers\Admin\GroupSettingsController::class, 'groups'])->name('admin.groups');
+    Route::get('/admin/groups/{id}/details', [App\Http\Controllers\Admin\GroupSettingsController::class, 'groupDetails'])->name('admin.groups.details');
 });
 
 // Dashboard routes (protected by auth middleware)

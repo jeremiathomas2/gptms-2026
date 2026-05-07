@@ -7,6 +7,7 @@ use App\Models\GroupSettings;
 use App\Models\Group;
 use App\Models\User;
 use App\Models\GroupMember;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,6 +19,37 @@ class GroupSettingsController extends Controller
         $groups = Group::with('members')->latest()->get();
         
         return view('admin.group-settings', compact('settings', 'groups'));
+    }
+
+    public function groups()
+    {
+        $groups = Group::with(['creator', 'activeMembers.user', 'project'])
+            ->latest()
+            ->get();
+        
+        $totalMembers = GroupMember::where('status', 'joined')->count();
+        $supervisors = User::whereHas('roles', function($query) {
+            $query->where('name', 'supervisor');
+        })->get();
+        
+        return view('admin.groups', compact('groups', 'totalMembers', 'supervisors'));
+    }
+
+    public function groupDetails($id)
+    {
+        $group = Group::with([
+            'creator', 
+            'activeMembers.user.studentProfile',
+            'activeMembers.user.skills',
+            'project'
+        ])->findOrFail($id);
+        
+        $html = view('admin.partials.group-details', compact('group'))->render();
+        
+        return response()->json([
+            'success' => true,
+            'html' => $html
+        ]);
     }
 
     public function update(Request $request)
@@ -44,6 +76,7 @@ class GroupSettingsController extends Controller
         ]);
 
         $settings = GroupSettings::getCurrent();
+        $oldSettings = $settings->toArray();
         $settings->fill($validated);
         $settings->updated_by = session('user.id');
         
@@ -54,6 +87,11 @@ class GroupSettingsController extends Controller
         
         $settings->save();
 
+        // Log the settings update
+        $user = User::find(session('user.id'));
+        $changes = array_diff_assoc($validated, $oldSettings);
+        ActivityLogger::logSettingsUpdate($settings, $changes, $user);
+
         return response()->json([
             'success' => true,
             'message' => 'Settings saved successfully'
@@ -62,9 +100,6 @@ class GroupSettingsController extends Controller
 
     private function startCountdown(Request $request)
     {
-        \Log::info('Start countdown method called');
-        \Log::info('Request data:', $request->all());
-        
         $validated = $request->validate([
             'participants_per_group' => 'required|integer|min:2|max:10',
             'countdown_minutes' => 'required|integer|min:1|max:1440',
@@ -73,8 +108,6 @@ class GroupSettingsController extends Controller
             'auto_create_groups' => 'boolean',
         ]);
 
-        \Log::info('Validated data:', $validated);
-
         $settings = GroupSettings::getCurrent();
         $settings->fill($validated);
         $settings->is_active = true;
@@ -82,9 +115,11 @@ class GroupSettingsController extends Controller
         $settings->created_by = session('user.id');
         $settings->updated_by = session('user.id');
         
-        \Log::info('Settings before save:', $settings->toArray());
         $settings->save();
-        \Log::info('Settings saved successfully');
+
+        // Log countdown start
+        $user = User::find(session('user.id'));
+        ActivityLogger::logCountdownStart($settings, $user);
 
         return response()->json([
             'success' => true,
@@ -100,6 +135,10 @@ class GroupSettingsController extends Controller
             $settings->countdown_end_time = null;
             $settings->updated_by = session('user.id');
             $settings->save();
+
+            // Log countdown stop
+            $user = User::find(session('user.id'));
+            ActivityLogger::logCountdownStop($settings, $user);
         }
 
         return response()->json([
@@ -136,6 +175,10 @@ class GroupSettingsController extends Controller
 
         // Create balanced groups
         $groupsCreated = $this->createBalancedGroups($students, $settings);
+
+        // Log automatic group creation
+        $user = User::find(session('user.id'));
+        ActivityLogger::logAutomaticGroupCreation($groupsCreated, $settings, $user);
 
         // Stop countdown after creating groups
         $settings->is_active = false;
