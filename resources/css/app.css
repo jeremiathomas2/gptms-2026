@@ -5,14 +5,86 @@
 /* Custom styles for GPTFMS */
 @layer base {
     html {
-        font-family: 'Inter', system-ui, sans-serif;
+        font-family: 'Nunito Sans', system-ui, sans-serif;
+    }
+    
+    /* Ensure content area stretches properly */
+    main {
+        width: 100%;
+        flex: 1;
+    }
+    
+    main > div {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    /* Sidebar transition fixes */
+    .sidebar-transition {
+        transition: width 0.3s ease, margin-left 0.3s ease;
     }
 }
+    
+    /* Phoenix Template Typography Base */
+    body {
+        font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #2d3748;
+        background-color: #f8fafc;
+    }
+    
+    /* Phoenix Font Weight Classes */
+    .font-light { font-weight: 300; }
+    .font-normal { font-weight: 400; }
+    .font-semibold { font-weight: 600; }
+    .font-bold { font-weight: 700; }
+    .font-extrabold { font-weight: 800; }
+    .font-black { font-weight: 900; }
+    
+    /* Phoenix Text Sizes */
+    .text-xs { font-size: 0.75rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-base { font-size: 1rem; }
+    .text-lg { font-size: 1.125rem; }
+    .text-xl { font-size: 1.25rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .text-3xl { font-size: 1.875rem; }
+    .text-4xl { font-size: 2.25rem; }
+    .text-5xl { font-size: 3rem; }
+    
+    /* Phoenix Heading Styles */
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 600;
+        line-height: 1.25;
+        margin-bottom: 0.5em;
+    }
+    
+    h1 { font-size: 2.25rem; font-weight: 700; }
+    h2 { font-size: 1.875rem; font-weight: 700; }
+    h3 { font-size: 1.5rem; font-weight: 600; }
+    h4 { font-size: 1.25rem; font-weight: 600; }
+    h5 { font-size: 1.125rem; font-weight: 600; }
+    h6 { font-size: 1rem; font-weight: 600; }
 
 @layer components {
-    /* Card styles */
+    /* Phoenix Template Color Utilities */
+    .text-body { color: #2d3748; }
+    .text-body-secondary { color: #718096; }
+    .text-body-tertiary { color: #a0aec0; }
+    .text-body-quaternary { color: #cbd5e0; }
+    .text-body-highlight { color: #1a202c; }
+    
+    .bg-body { background-color: #f8fafc; }
+    .bg-body-secondary { background-color: #edf2f7; }
+    .bg-body-tertiary { background-color: #e2e8f0; }
+    
+    /* Phoenix Template Component Styles */
     .card {
         @apply bg-white rounded-lg shadow-md border border-gray-200;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e2e8f0;
     }
     
     .card-header {
@@ -23,17 +95,110 @@
         @apply p-6;
     }
     
-    /* Button styles */
+    /* Phoenix Template Button Styles */
     .btn {
-        @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+        @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+        font-weight: 600;
+        border-radius: 0.375rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        transition: all 0.15s ease-in-out;
     }
     
     .btn-primary {
-        @apply bg-blue-600 text-white hover:bg-blue-700;
+        @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     }
     
     .btn-secondary {
-        @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
+        @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500;
+    }
+    
+    .btn-outline {
+        @apply border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-2 focus:ring-gray-500;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    /* Phoenix Template Form Styles */
+    .form-control {
+        @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        background-color: #ffffff;
+        border: 1px solid #d2d6dc;
+        border-radius: 0.375rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-2;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Phoenix Template Utility Classes */
+    .navbar-dropdown-caret {
+        border-radius: 0.375rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .dropdown-menu {
+        border: 1px solid #e2e8f0;
+        border-radius: 0.375rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+    
+    .dropdown-item {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: #374151;
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+    
+    /* Phoenix Template Badge Styles */
+    .badge {
+        display: inline-block;
+        padding: 0.25em 0.4em;
+        font-size: 75%;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+    
+    .badge-phoenix {
+        background-color: #edf2f7;
+        color: #2d3748;
+    }
+    
+    .badge-phoenix-warning {
+        background-color: #fef3c7;
+        color: #92400e;
     }
     
     /* Form styles */

@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'student' => \App\Http\Middleware\StudentMiddleware::class,
             'supervisor' => \App\Http\Middleware\SupervisorMiddleware::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'role.switch' => \App\Http\Middleware\RoleSwitchMiddleware::class,
         ]);
         
         // Apply essential middleware to web routes group

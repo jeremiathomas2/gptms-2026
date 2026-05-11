@@ -3,6 +3,9 @@
 @section('title', 'Analytics - GPTFMS')
 
 @section('content')
+@if(session('user.role') === 'supervisor')
+    @include('analytics.supervisor')
+@else
 <div class="space-y-6">
     <!-- Page Header -->
     <div class="flex justify-between items-center">
@@ -570,4 +573,5 @@
         </div>
     </div>
 </div>
+@endif
 @endsection

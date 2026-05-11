@@ -11,7 +11,31 @@
             <p class="text-gray-500">Manage users, roles, and permissions</p>
         </div>
         <div class="flex space-x-3">
-            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+            <button onclick="downloadTemplate('students')" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span class="whitespace-nowrap">Student Template</span>
+            </button>
+            <button onclick="downloadTemplate('supervisors')" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span class="whitespace-nowrap">Supervisor Template</span>
+            </button>
+            <button onclick="showImportModal('students')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center space-x-2">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span class="whitespace-nowrap">Import Students</span>
+            </button>
+            <button onclick="showImportModal('supervisors')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span class="whitespace-nowrap">Import Supervisors</span>
+            </button>
+            <button onclick="exportUsers()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                 </svg>
@@ -27,8 +51,8 @@
     </div>
 
     <!-- User Statistics -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+    <div class="flex flex-col lg:flex-row gap-4 sm:gap-6">
+        <div class="flex-1 bg-white rounded-lg shadow p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Users</p>
@@ -37,12 +61,12 @@
                 </div>
                 <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0H6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+        <div class="flex-1 bg-white rounded-lg shadow p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Active Users</p>
@@ -56,7 +80,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+        <div class="flex-1 bg-white rounded-lg shadow p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Admin Users</p>
@@ -65,12 +89,13 @@
                 </div>
                 <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h6m2 5h6a2 2 0 012 2v-1a2 2 0 01-2 2h-3m-6 0a2 2 0 00-2 2v-1a2 2 0 012 2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15l-9-5m9 5v6a2 2 0 012-2h6a2 2 0 012 2v-4a2 2 0 11-2 2h-6a2 2 0 00-2 2v-2z"/>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
+        <div class="flex-1 bg-white rounded-lg shadow p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Students</p>
@@ -79,7 +104,22 @@
                 </div>
                 <div class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3h6m-6 3a2 2 0 00-2 2v3m0 0h6v-3m-6 3a2 2 0 00-2 2v-3m0 0h6v3"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253a9 9 0 11-18 0 9 9 0 0118 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 8.25a.75.75 0 111.5 0 1.5v1.5a.75.75 0 001.5 0H8.25V7.5a.75.75 0 001.5 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="flex-1 bg-white rounded-lg shadow p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Supervisors</p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $users->filter(function($user) { return $user->hasRole('supervisor'); })->count() }}</p>
+                    <p class="text-xs text-orange-600 mt-1">Supervisor accounts</p>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                 </div>
             </div>
@@ -167,6 +207,16 @@
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Phone</span>
                             <span class="font-medium text-xs sm:text-sm">{{ $user->phone ?? 'Not provided' }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Gender</span>
+                            <span class="font-medium text-xs sm:text-sm">
+                                @if($user->gender)
+                                    {{ ucfirst($user->gender) }}
+                                @else
+                                    <span class="text-gray-400">Not specified</span>
+                                @endif
+                            </span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Groups</span>
@@ -441,9 +491,93 @@ function addUser() {
 
 // Search functionality
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing user management functionality');
+    
     const searchInput = document.querySelector('input[placeholder="Search users..."]');
     const roleFilter = document.querySelector('select');
     const statusFilter = document.querySelectorAll('select')[1];
+    
+    // Initialize button functionality after DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing user management functionality');
+    
+    // Test button clicks after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        // Try multiple selectors for buttons
+        const exportBtn = document.querySelector('button[onclick*="export"]') || 
+                          document.querySelector('button[onclick*="exportUsers()"]');
+        const importStudentBtn = document.querySelector('button[onclick*="showImportModal(\'students\')"]') || 
+                             document.querySelector('button[onclick*="showImportModal(\'students\')"]');
+        const importSupervisorBtn = document.querySelector('button[onclick*="showImportModal(\'supervisors\')"]') || 
+                               document.querySelector('button[onclick*="showImportModal(\'supervisors\')"]');
+        
+        console.log('Button elements found:', {
+            exportBtn: !!exportBtn,
+            importStudentBtn: !!importStudentBtn,
+            importSupervisorBtn: !!importSupervisorBtn
+        });
+        
+        // Test click functionality with comprehensive error handling
+        const addClickListener = (button, name) => {
+            if (button) {
+                button.addEventListener('click', () => {
+                    console.log(`${name} button clicked`);
+                    try {
+                        if (button.onclick) {
+                            eval(button.onclick);
+                        } else {
+                            console.error(`${name} button has no onclick handler`);
+                        }
+                    } catch (error) {
+                        console.error(`Error executing ${name} button:`, error);
+                    }
+                });
+            } else {
+                console.error(`${name} button not found`);
+            }
+        };
+        
+        addClickListener(exportBtn, 'Export');
+        addClickListener(importStudentBtn, 'Import Students');
+        addClickListener(importSupervisorBtn, 'Import Supervisors');
+        
+        // Test modal function
+        if (typeof showImportModal === 'function') {
+            console.log('showImportModal function exists, testing modal creation');
+            showImportModal('students'); // Test modal creation
+        }
+        
+        // Test template function
+        if (typeof downloadTemplate === 'function') {
+            console.log('downloadTemplate function exists, testing template download');
+            downloadTemplate('students'); // Test template download
+        }
+        
+        // Test direct function calls
+        if (typeof exportUsers === 'function') {
+            console.log('exportUsers function exists, testing direct call');
+            exportUsers();
+        }
+        
+        // Test direct function calls
+        if (typeof downloadTemplate === 'function') {
+            console.log('downloadTemplate function exists, testing direct call');
+            downloadTemplate('supervisors'); // Test supervisor template download
+        }
+        
+        // Test direct function calls
+        if (typeof showImportModal === 'function') {
+            console.log('showImportModal function exists, testing modal creation');
+            showImportModal('supervisors'); // Test supervisor modal creation
+        }
+        
+        // Test direct function calls
+        if (typeof exportUsers === 'function') {
+            console.log('exportUsers function exists, testing direct call');
+            exportUsers();
+        }
+    }, 1000); // Longer delay to ensure DOM is fully ready
+});
     
     if (searchInput) {
         searchInput.addEventListener('input', function(e) {
@@ -547,6 +681,295 @@ function showNotification(message, type = 'info') {
 // Delete confirmation function
 function confirmDelete(userName) {
     return confirm('Are you sure you want to delete the user "' + userName + '"? This action cannot be undone.');
+}
+
+// Import functionality
+function showImportModal(type) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Import ${type === 'students' ? 'Students' : 'Supervisors'}</h3>
+            <form id="importForm" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select CSV File</label>
+                    <input type="file" name="csv_file" accept=".csv" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">Only CSV files are allowed</p>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeImportModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Import</button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Handle form submission
+    const form = document.getElementById('importForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleImport(type, form);
+    });
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeImportModal();
+        }
+    });
+}
+
+function closeImportModal() {
+    const modal = document.querySelector('.fixed.inset-0');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Ensure functions are globally accessible and available
+window.showImportModal = showImportModal;
+window.closeImportModal = closeImportModal;
+window.downloadTemplate = downloadTemplate;
+window.exportUsers = exportUsers;
+window.handleImport = handleImport;
+
+// Initialize all functions when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing user management functionality');
+    
+    // Test button clicks after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        // Try multiple selectors for buttons
+        const exportBtn = document.querySelector('button[onclick*="export"]') || 
+                          document.querySelector('button[onclick*="exportUsers()"]');
+        const importStudentBtn = document.querySelector('button[onclick*="showImportModal(\'students\')"]') || 
+                             document.querySelector('button[onclick*="showImportModal(\'students\')"]');
+        const importSupervisorBtn = document.querySelector('button[onclick*="showImportModal(\'supervisors\')"]') || 
+                               document.querySelector('button[onclick*="showImportModal(\'supervisors\')"]');
+        
+        console.log('Button elements found:', {
+            exportBtn: !!exportBtn,
+            importStudentBtn: !!importStudentBtn,
+            importSupervisorBtn: !!importSupervisorBtn
+        });
+        
+        // Test click functionality with comprehensive error handling
+        const addClickListener = (button, name) => {
+            if (button) {
+                button.addEventListener('click', () => {
+                    console.log(`${name} button clicked`);
+                    try {
+                        if (button.onclick) {
+                            eval(button.onclick);
+                        } else {
+                            console.error(`${name} button has no onclick handler`);
+                        }
+                    } catch (error) {
+                        console.error(`Error executing ${name} button:`, error);
+                    }
+                });
+            } else {
+                console.error(`${name} button not found`);
+            }
+        };
+        
+        addClickListener(exportBtn, 'Export');
+        addClickListener(importStudentBtn, 'Import Students');
+        addClickListener(importSupervisorBtn, 'Import Supervisors');
+    }, 2000); // Longer delay to ensure DOM is fully ready
+});
+
+function handleImport(type, form) {
+    const formData = new FormData(form);
+    const file = formData.get('csv_file');
+    
+    if (!file) {
+        showNotification('Please select a CSV file', 'error');
+        return;
+    }
+    
+    if (!file.name.endsWith('.csv')) {
+        showNotification('Please select a valid CSV file', 'error');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="animate-pulse">Importing...</span>';
+    submitBtn.disabled = true;
+    
+    // Send raw CSV file to server for processing
+    const url = '/import-users';
+}
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        }
+    })
+    .then(response => response.json())
+    .then(result => {
+        closeImportModal();
+        
+        if (result.success) {
+            let message = `Successfully imported ${result.imported} ${type}`;
+            if (result.errors && result.errors.length > 0) {
+                message += ` (${result.errors.length} errors skipped)`;
+            }
+            showNotification(message, 'success');
+            
+            // Refresh page to show new users
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            showNotification('Import failed: ' + (result.error || 'Unknown error'), 'error');
+        }
+        
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    })
+    .catch(error => {
+        showNotification('Upload failed: ' + error.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+}
+
+function createCSVContent(data) {
+    if (data.length === 0) return '';
+    
+    const headers = Object.keys(data[0]);
+    const csvRows = [headers.join(',')];
+    
+    data.forEach(row => {
+        const values = headers.map(header => {
+            const value = row[header] || '';
+            return `"${value}"`;
+        });
+        csvRows.push(values.join(','));
+    });
+    
+    return csvRows.join('\n');
+}
+
+function downloadTemplate(type) {
+    const headers = type === 'students' 
+        ? ['first_name', 'last_name', 'email', 'phone', 'gender', 'registration_number']
+        : ['first_name', 'last_name', 'email', 'phone', 'gender'];
+    
+    const sampleData = type === 'students'
+        ? ['John', 'Doe', 'john.doe@student.edu', '+255123456789', 'male', 'STU001']
+        : ['Jane', 'Smith', 'jane.smith@supervisor.ac.tz', '+255987654321', 'female'];
+    
+    let csvContent = headers.join(',') + '\n';
+    csvContent += sampleData.join(',');
+    
+    // Create and download CSV file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${type}_template.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showNotification(`${type === 'students' ? 'Student' : 'Supervisor'} template downloaded`, 'success');
+}
+
+function exportUsers() {
+    // Get current filter values
+    const roleFilter = document.getElementById('roleFilter')?.value || 'all';
+    const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+    const searchQuery = document.getElementById('searchInput')?.value || '';
+    
+    // Show loading state
+    const exportBtn = event.target;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.disabled = true;
+    exportBtn.innerHTML = `
+        <svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018 0 8 8 0 0116 0zm0 0a8 8 0 00-8 0v8a8 8 0 018 0z"/>
+        </svg>
+        Exporting...
+    `;
+    
+    // Collect all visible user cards
+    const userCards = document.querySelectorAll('.grid > div:not([style*="display: none"])');
+    const userData = [];
+    
+    userCards.forEach(card => {
+        const nameElement = card.querySelector('.text-gray-900');
+        const emailElement = card.querySelector('.text-gray-500');
+        const roleElement = card.querySelector('.bg-purple-100, .bg-blue-100, .bg-green-100');
+        const statusElement = card.querySelectorAll('.bg-green-100, .bg-yellow-100, .bg-red-100')[1];
+        
+        if (nameElement && emailElement && roleElement && statusElement) {
+            const name = nameElement.textContent.trim();
+            const email = emailElement.textContent.trim();
+            const role = roleElement.textContent.toLowerCase().replace(' accounts', '').replace(' users', '');
+            const status = statusElement.textContent.toLowerCase();
+            
+            userData.push({
+                name: name,
+                email: email,
+                role: role,
+                status: status
+            });
+        }
+    });
+    
+    // Apply filters
+    let filteredData = userData;
+    
+    if (roleFilter !== 'all') {
+        filteredData = filteredData.filter(user => user.role === roleFilter);
+    }
+    
+    if (statusFilter !== 'all') {
+        filteredData = filteredData.filter(user => user.status === statusFilter);
+    }
+    
+    if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase();
+        filteredData = filteredData.filter(user => 
+            user.name.toLowerCase().includes(searchLower) ||
+            user.email.toLowerCase().includes(searchLower)
+        );
+    }
+    
+    // Generate CSV content
+    const headers = ['name', 'email', 'role', 'status'];
+    let csvContent = headers.join(',') + '\n';
+    
+    filteredData.forEach(user => {
+        csvContent += `"${user.name}","${user.email}","${user.role}","${user.status}"\n`;
+    });
+    
+    // Create and download CSV file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    // Reset button state
+    exportBtn.disabled = false;
+    exportBtn.innerHTML = originalText;
+    
+    showNotification(`Successfully exported ${filteredData.length} users`, 'success');
 }
 </script>
 @endsection

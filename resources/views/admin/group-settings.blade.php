@@ -80,19 +80,17 @@
                     <p class="text-xs text-gray-500 mt-1">Number of students to assign to each group (2-10)</p>
                 </div>
 
-                <!-- Countdown Minutes -->
+                <!-- Countdown End Time -->
                 <div>
-                    <label for="countdown_minutes" class="block text-sm font-medium text-gray-700 mb-2">
-                        Countdown Duration (minutes)
+                    <label for="countdown_end_time" class="block text-sm font-medium text-gray-700 mb-2">
+                        Countdown End Date & Time
                     </label>
-                    <input type="number" 
-                           id="countdown_minutes" 
-                           name="countdown_minutes" 
-                           min="1" 
-                           max="1440" 
-                           value="{{ $settings->countdown_minutes ?? 60 }}"
+                    <input type="datetime-local" 
+                           id="countdown_end_time" 
+                           name="countdown_end_time" 
+                           value="{{ $settings?->countdown_end_time ? $settings->countdown_end_time->format('Y-m-d\TH:i') : now()->addHours(1)->format('Y-m-d\TH:i') }}"
                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <p class="text-xs text-gray-500 mt-1">Duration before automatic group creation (1-1440 minutes)</p>
+                    <p class="text-xs text-gray-500 mt-1">Date and time when automatic group creation will occur</p>
                 </div>
             </div>
 
@@ -213,6 +211,41 @@
 <script>
 let countdownInterval = null;
 
+// Validate datetime field on change
+document.addEventListener('DOMContentLoaded', function() {
+    const datetimeField = document.getElementById('countdown_end_time');
+    
+    if (datetimeField) {
+        datetimeField.addEventListener('change', validateDateTime);
+        datetimeField.addEventListener('blur', validateDateTime);
+    }
+});
+
+function validateDateTime() {
+    const datetimeField = document.getElementById('countdown_end_time');
+    const selectedDateTime = new Date(datetimeField.value);
+    const currentDateTime = new Date();
+    
+    // Add 5 minutes buffer to ensure it's in the future
+    const minimumDateTime = new Date(currentDateTime.getTime() + 5 * 60000);
+    
+    if (selectedDateTime <= minimumDateTime) {
+        datetimeField.setCustomValidity('Please select a date and time at least 5 minutes in the future.');
+        datetimeField.classList.add('border-red-500');
+        datetimeField.classList.remove('border-gray-300');
+        
+        showNotification('Please select a date and time at least 5 minutes in the future.', 'error');
+        
+        // Set to minimum valid time
+        const validDateTime = new Date(currentDateTime.getTime() + 60 * 60000); // 1 hour from now
+        datetimeField.value = validDateTime.toISOString().slice(0, 16);
+    } else {
+        datetimeField.setCustomValidity('');
+        datetimeField.classList.remove('border-red-500');
+        datetimeField.classList.add('border-gray-300');
+    }
+}
+
 function startCountdown() {
     console.log('Start countdown button clicked');
     
@@ -307,6 +340,18 @@ function createGroupsNow() {
 // Form submission
 document.getElementById('group-settings-form').addEventListener('submit', function(e) {
     e.preventDefault();
+    
+    // Validate datetime field before submission
+    const datetimeField = document.getElementById('countdown_end_time');
+    if (datetimeField) {
+        validateDateTime();
+        
+        // Check if validation failed
+        if (datetimeField.validity.valid === false) {
+            showNotification('Please select a valid future date and time.', 'error');
+            return;
+        }
+    }
     
     const formData = new FormData(this);
     

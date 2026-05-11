@@ -7,8 +7,20 @@
     <!-- Page Header -->
     <div class="flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">User Details</h1>
-            <p class="text-gray-500">View and manage user information</p>
+            <h1 class="text-2xl font-bold text-gray-900">
+                @if($user->hasRole('supervisor'))
+                    Supervisor Information
+                @else
+                    User Details
+                @endif
+            </h1>
+            <p class="text-gray-500">
+                @if($user->hasRole('supervisor'))
+                    View and manage supervisor information
+                @else
+                    View and manage user information
+                @endif
+            </p>
         </div>
         <div class="flex space-x-3">
             <a href="{{ route('users') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
@@ -17,12 +29,21 @@
                 </svg>
                 <span class="whitespace-nowrap">Back to Users</span>
             </a>
-            <a href="{{ route('users.edit', $user->id) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-                <span class="whitespace-nowrap">Edit User</span>
-            </a>
+            @if($user->hasRole('supervisor'))
+                <a href="{{ route('users.edit', $user->id) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    <span class="whitespace-nowrap">Edit Supervisor</span>
+                </a>
+            @else
+                <a href="{{ route('users.edit', $user->id) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    <span class="whitespace-nowrap">Edit User</span>
+                </a>
+            @endif
         </div>
     </div>
 
@@ -137,49 +158,7 @@
         </div>
     </div>
 
-    <!-- Groups and Activities -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Groups -->
-        @if($user->hasRole('supervisor'))
-        <div class="bg-white rounded-lg shadow">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Supervising Groups</h3>
-                <p class="text-sm text-gray-500">Groups this supervisor is currently supervising</p>
-            </div>
-            <div class="p-6">
-                @php
-                    $supervisingGroups = \App\Models\Group::where('created_by', $user->id)->get();
-                @endphp
-                @if ($supervisingGroups->count() > 0)
-                    <div class="space-y-3">
-                        @foreach ($supervisingGroups as $group)
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div>
-                                    <h4 class="font-medium text-gray-900">{{ $group->name }}</h4>
-                                    <p class="text-sm text-gray-500">{{ $group->description }}</p>
-                                    <p class="text-xs text-gray-400 mt-1">
-                                        {{ $group->members ? $group->members->count() : 0 }} member(s) • 
-                                        {{ $group->projects ? $group->projects->count() : 0 }} project(s)
-                                    </p>
-                                </div>
-                                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
-                                    Supervisor
-                                </span>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-8">
-                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        <p class="text-gray-500">No supervising groups found</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-        @endif
-
+    
         <!-- Recent Activity -->
         <div class="bg-white rounded-lg shadow">
             <div class="p-6 border-b border-gray-200">

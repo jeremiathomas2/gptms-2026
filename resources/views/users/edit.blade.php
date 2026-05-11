@@ -27,7 +27,34 @@
         </div>
     </div>
 
-    <!-- Error Messages -->
+    <!-- Success/Error Messages -->
+    @if(session('success'))
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <div>
+                    <span class="text-green-700 font-medium">{{ session('success') }}</span>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                <div>
+                    <span class="text-red-700 font-medium">{{ session('error') }}</span>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Validation Errors -->
     @if($errors->any())
         <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
             <div class="flex items-center">
@@ -50,12 +77,13 @@
     <div class="bg-white rounded-lg shadow">
         <div class="p-6 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">User Information</h3>
-            <p class="text-sm text-gray-500">Update the user's personal and account information</p>
+            <p class="text-sm text-gray-500">Update user's personal and account information</p>
         </div>
         <div class="p-6">
-            <form action="{{ route('users.update', $user->id) }}" method="POST" class="space-y-6">
+            <form action="{{ route('users.update', $user->id) }}" method="POST" class="space-y-6" id="userEditForm">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="user_id" value="{{ $user->id }}">
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Personal Information -->
@@ -98,6 +126,20 @@
                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                    placeholder="Optional">
                             @error('phone')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                            <select name="gender" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Gender</option>
+                                <option value="male" {{ $user->gender === 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="female" {{ $user->gender === 'female' ? 'selected' : '' }}>Female</option>
+                                <option value="other" {{ $user->gender === 'other' ? 'selected' : '' }}>Other</option>
+                                <option value="prefer_not_to_say" {{ $user->gender === 'prefer_not_to_say' ? 'selected' : '' }}>Prefer not to say</option>
+                            </select>
+                            @error('gender')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -186,3 +228,152 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+// Auto-dismiss notifications after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for success or error messages
+    const successMessage = '{{ session('success') ?? '' }}';
+    const errorMessage = '{{ session('error') ?? '' }}';
+    
+    if (successMessage) {
+        showNotification('success', successMessage);
+    }
+    
+    if (errorMessage) {
+        showNotification('error', errorMessage);
+    }
+    
+    // Clear notifications from session after displaying
+    setTimeout(() => {
+        clearNotifications();
+    }, 5000);
+});
+
+function showNotification(type, message) {
+    // Remove any existing notifications
+    removeExistingNotifications();
+    
+    // Create new notification
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-all duration-300 ${
+        type === 'success' 
+            ? 'bg-green-50 border-green-200 text-green-800' 
+            : 'bg-red-50 border-red-200 text-red-800'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                ${type === 'success' 
+                    ? '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'
+                    : '<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>'
+                }
+            </div>
+            <div class="ml-3">
+                <p class="font-medium">${message}</p>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-sm underline hover:no-underline">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.classList.add('translate-x-0', 'opacity-100');
+        notification.classList.remove('translate-x-full', 'opacity-0');
+    }, 100);
+}
+
+function removeExistingNotifications() {
+    const notifications = document.querySelectorAll('[class*="fixed top-4 right-4"]');
+    notifications.forEach(n => n.remove());
+}
+
+function clearNotifications() {
+    // Make AJAX request to clear session notifications
+    fetch('/clear-notifications', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json'
+        }
+    }).catch(error => console.error('Error clearing notifications:', error));
+}
+
+// Standard form submission handling with validation
+document.getElementById('userEditForm')?.addEventListener('submit', function(e) {
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const form = e.target;
+    
+    // Client-side validation
+    if (!validateForm(form)) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Show loading state
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H2V4a2 2 0 00-2-2h6l2 3h6a2 2 0 002 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path>
+            </svg>
+            Saving...
+        `;
+    }
+    
+    // Allow normal form submission to proceed
+    // Don't prevent default - let Laravel handle the submission
+});
+
+// Client-side form validation
+function validateForm(form) {
+    let isValid = true;
+    const errors = [];
+    
+    // Required fields validation
+    const requiredFields = ['first_name', 'last_name', 'email', 'role', 'status'];
+    requiredFields.forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field && (!field.value || field.value.trim() === '')) {
+            errors.push(`${fieldName.replace('_', ' ')} is required`);
+            isValid = false;
+        }
+    });
+    
+    // Gender validation
+    const genderField = form.querySelector('[name="gender"]');
+    if (genderField && genderField.value) {
+        const validGenders = ['male', 'female', 'other', 'prefer_not_to_say'];
+        if (!validGenders.includes(genderField.value)) {
+            errors.push('Please select a valid gender option');
+            isValid = false;
+        }
+    }
+    
+    // Email validation
+    const emailField = form.querySelector('[name="email"]');
+    if (emailField && emailField.value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailField.value)) {
+            errors.push('Please enter a valid email address');
+            isValid = false;
+        }
+    }
+    
+    // Show validation errors if any
+    if (!isValid) {
+        showNotification('error', errors.join(', '));
+    }
+    
+    return isValid;
+}
+
+</script>
+@endpush

@@ -1,319 +1,1379 @@
-@extends('layouts.app-login')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Register | GPTFMS</title>
+  <!-- Phoenix Template Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Phoenix Template Icon Fonts -->
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
 
-@section('title', 'Register - GPTFMS')
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 30% 10%, #0a0c1a, #03050b);
+      font-family: 'Nunito Sans', sans-serif;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      position: relative;
+      overflow-x: hidden;
+      padding: 1.5rem;
+      padding-top: 180px;
+      margin: 0;
+      box-sizing: border-box;
+    }
 
-@section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
-    <div class="w-full max-w-md">
-        <!-- Register Card -->
-        <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8">
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <div class="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
-                    <span class="text-white font-bold text-xl">G</span>
-                </div>
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">
-                    Create your account
-                </h2>
-                <p class="text-sm text-gray-600">
-                    Or
-                    <a href="/login" class="font-medium text-blue-600 hover:text-blue-500">
-                        sign in to your existing account
-                    </a>
-                </p>
-            </div>
+    /* ========= LIQUID BLOBS (ANIMATED BACKGROUND) ========= */
+    .blob-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
 
-            <!-- Register Form -->
-            <form class="mt-8 space-y-6" action="/register" method="POST">
-                @csrf
-                <input type="hidden" name="form_type" value="register">
-                
-                <!-- Role Selection -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        User Type *
-                    </label>
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center">
-                            <input type="radio" id="student" name="role" value="student" checked class="sr-only peer" required>
-                            <label for="student" class="flex items-center px-4 py-2 bg-gray-100 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-checked:text-white hover:bg-gray-200 transition-all duration-200">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                </svg>
-                                <span class="font-medium">Student</span>
-                            </label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="radio" id="supervisor" name="role" value="supervisor" class="sr-only peer" required>
-                            <label for="supervisor" class="flex items-center px-4 py-2 bg-gray-100 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-checked:text-white hover:bg-gray-200 transition-all duration-200">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                                </svg>
-                                <span class="font-medium">Supervisor</span>
-                            </label>
-                        </div>
-                    </div>
-                    <p id="role-description" class="mt-2 text-xs text-gray-500">
-                        Students can join groups and participate in projects.
-                    </p>
-                </div>
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.65;
+      animation: floatBlob 22s infinite alternate ease-in-out;
+    }
 
-                <!-- Name Fields -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
-                            First Name *
-                        </label>
-                        <input id="first_name" name="first_name" type="text" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                               placeholder="Enter your first name">
-                    </div>
-                    <div>
-                        <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
-                            Last Name *
-                        </label>
-                        <input id="last_name" name="last_name" type="text" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                               placeholder="Enter your last name">
-                    </div>
-                </div>
+    .blob-1 {
+      width: 55vw;
+      height: 55vw;
+      background: radial-gradient(circle at 30% 30%, rgba(88, 130, 255, 0.7), rgba(30, 80, 220, 0.3));
+      top: -20vh;
+      left: -15vw;
+      animation-duration: 24s;
+      animation-delay: 0s;
+    }
 
-                <!-- Email Field -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address *
-                    </label>
-                    <input id="email" name="email" type="email" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="Enter your email address">
-                </div>
+    .blob-2 {
+      width: 65vw;
+      height: 65vw;
+      background: radial-gradient(circle at 70% 60%, rgba(255, 90, 180, 0.6), rgba(160, 50, 220, 0.4));
+      bottom: -35vh;
+      right: -20vw;
+      animation-duration: 28s;
+      animation-delay: 2s;
+    }
 
-                <!-- Phone Field -->
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number *
-                    </label>
-                    <input id="phone" name="phone" type="tel" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="Enter your phone number">
-                </div>
+    .blob-3 {
+      width: 45vw;
+      height: 45vw;
+      background: radial-gradient(circle at 40% 50%, rgba(0, 210, 200, 0.6), rgba(40, 170, 220, 0.5));
+      top: 40vh;
+      left: 55vw;
+      animation-duration: 20s;
+      animation-delay: 5s;
+      filter: blur(80px);
+    }
 
-                <!-- Gender Field -->
-                <div>
-                    <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">
-                        Gender *
-                    </label>
-                    <select id="gender" name="gender" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">Select your gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
+    .blob-4 {
+      width: 40vw;
+      height: 40vw;
+      background: radial-gradient(circle at 80% 20%, rgba(255, 180, 70, 0.55), rgba(255, 80, 120, 0.4));
+      bottom: 10vh;
+      left: -10vw;
+      animation-duration: 26s;
+      animation-delay: 1s;
+    }
 
-                <!-- Registration Number Field - controlled by JavaScript -->
-                <div id="registration-number-wrapper"></div>
+    @keyframes floatBlob {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+      40% {
+        transform: translate(5%, 8%) scale(1.08);
+      }
+      70% {
+        transform: translate(-4%, 3%) scale(0.95);
+      }
+      100% {
+        transform: translate(7%, -6%) scale(1.12);
+      }
+    }
 
-                <!-- Password Field -->
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                        Password
-                    </label>
-                    <input id="password" name="password" type="password" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="Create a password">
-                </div>
+    /* ========= MAIN CARD – LIQUID GLASS EFFECT ========= */
+    .glass-card {
+      position: relative;
+      z-index: 20;
+      width: 100%;
+      max-width: 520px;
+      margin-top: 0;
+      background: rgba(20, 30, 55, 0.28);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.4s ease;
+      overflow: hidden;
+    }
 
-                <!-- Confirm Password Field -->
-                <div>
-                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
-                        Confirm Password
-                    </label>
-                    <input id="password_confirmation" name="password_confirmation" type="password" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="Confirm your password">
-                </div>
+    /* Liquid glass shine overlay (moving reflection) */
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -75%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      transform: skewX(-15deg);
+      transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      pointer-events: none;
+    }
 
-                <!-- Terms and Conditions -->
-                <div class="flex items-center">
-                    <input id="terms" name="terms" type="checkbox" required
-                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                    <label for="terms" class="ml-2 block text-sm text-gray-900">
-                        I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms and Conditions</a>
-                    </label>
-                </div>
+    .glass-card:hover::before {
+      left: 125%;
+    }
 
-                <!-- Submit Button -->
-                <div>
-                    <button type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
-                        Create Account
-                    </button>
-                </div>
-            </form>
+    /* inner content */
+    .card-content {
+      padding: 2.2rem 2rem 2.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Full width header container */
+    .full-width-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      min-width: 100vw;
+      z-index: 25;
+      background: rgba(20, 30, 55, 0.28);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 0 0 2rem 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-top: none;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.4s ease;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    /* Liquid glass shine overlay for header */
+    .full-width-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -75%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      transform: skewX(-15deg);
+      transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      pointer-events: none;
+    }
+
+    .full-width-header:hover::before {
+      left: 125%;
+    }
+
+    /* Header content layout */
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 64px;
+      padding: 0 1rem;
+      max-width: 100%;
+    }
+
+    @media (min-width: 640px) {
+      .header-content {
+        padding: 0 1.5rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .header-content {
+        padding: 0 2rem;
+      }
+    }
+
+    /* Header left side */
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .header-logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #031969, #4285f4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      box-shadow: 0 6px 20px rgba(3, 25, 105, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .header-logo-icon:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(3, 25, 105, 0.4);
+    }
+
+    .header-logo-text {
+      color: white;
+      font-weight: bold;
+      font-size: 24px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-info h1 {
+      font-size: 20px;
+      font-weight: bold;
+      background: linear-gradient(125deg, #4285f4, #71d5f6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: #ffffff;
+      margin: 0;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    /* Header right side */
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .login-btn {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      background: #2563eb;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+
+    .login-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+    }
+
+    /* Register card header styling */
+    .register-card-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease-out;
+    }
+
+    .register-card-header.fade-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .register-header-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .register-header-icon:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+    }
+
+    .register-header-icon i {
+      font-size: 28px;
+      color: white;
+    }
+
+    .register-title {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(125deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin: 0 0 0.5rem 0;
+      letter-spacing: -0.5px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease-out;
+    }
+
+    .register-title.fade-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .register-subtitle {
+      font-size: 14px;
+      color: #8b9dc3;
+      margin: 0;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease-out;
+    }
+
+    .register-subtitle.fade-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* form group styling */
+    .input-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.1rem;
+      transition: color 0.2s;
+      pointer-events: none;
+    }
+
+    .input-field {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 2.2rem;
+      padding: 0.9rem 1rem 0.9rem 2.8rem;
+      font-size: 1rem;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      color: #f0f3ff;
+      backdrop-filter: blur(4px);
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    /* specific for password to have right padding for eye */
+    .password-wrapper .input-field {
+      padding-right: 3rem;
+    }
+
+    .input-field::placeholder {
+      color: rgba(210, 225, 255, 0.6);
+      font-weight: 400;
+      font-size: 0.9rem;
+    }
+
+    .input-field:focus {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 12px rgba(120, 160, 255, 0.4);
+      outline: none;
+    }
+
+    /* Gender dropdown specific styling */
+    select.input-field {
+      color: #f0f3ff;
+      background: rgba(255, 255, 255, 0.12);
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+    }
+
+    select.input-field option {
+      background: #1a2332;
+      color: #f0f3ff;
+      padding: 0.8rem;
+      border: none;
+    }
+
+    select.input-field option:hover,
+    select.input-field option:checked {
+      background: #667eea;
+      color: white;
+    }
+
+    /* Advanced Custom Dropdown Styling */
+    .custom-dropdown {
+      position: relative;
+      width: 100%;
+    }
+
+    .dropdown-selected {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 2.2rem;
+      padding: 0.9rem 1rem 0.9rem 2.8rem;
+      font-size: 1rem;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      color: #f0f3ff;
+      backdrop-filter: blur(4px);
+      outline: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dropdown-selected:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(120, 160, 255, 0.2);
+    }
+
+    .dropdown-selected:focus,
+    .dropdown-selected.active {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 12px rgba(120, 160, 255, 0.4);
+      outline: none;
+    }
+
+    .selected-text {
+      flex: 1;
+      text-align: left;
+    }
+
+    .dropdown-arrow {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+      transition: transform 0.3s ease, color 0.2s ease;
+    }
+
+    .dropdown-selected.active .dropdown-arrow {
+      transform: rotate(180deg);
+      color: white;
+    }
+
+    .dropdown-options {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      right: 0;
+      background: rgba(26, 35, 50, 0.95);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1.2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px) scale(0.95);
+      transition: all 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .dropdown-options.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .dropdown-option {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.2rem;
+      color: rgba(240, 243, 255, 0.9);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dropdown-option::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+      transition: left 0.4s ease;
+    }
+
+    .dropdown-option:hover::before {
+      left: 100%;
+    }
+
+    .dropdown-option:hover {
+      background: rgba(102, 126, 234, 0.2);
+      color: white;
+      padding-left: 1.5rem;
+      transform: translateX(4px);
+    }
+
+    .dropdown-option.selected {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      font-weight: 600;
+    }
+
+    .dropdown-option.selected::after {
+      content: '✓';
+      position: absolute;
+      right: 1.2rem;
+      color: white;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .option-icon {
+      margin-right: 0.8rem;
+      font-size: 1.1rem;
+      width: 1.2rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.8);
+      transition: color 0.2s ease;
+    }
+
+    .dropdown-option:hover .option-icon {
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .dropdown-option.selected .option-icon {
+      color: white;
+    }
+
+    .dropdown-option:first-child {
+      border-radius: 1.2rem 1.2rem 0 0;
+    }
+
+    .dropdown-option:last-child {
+      border-radius: 0 0 1.2rem 1.2rem;
+    }
+
+    /* Glass shine effect for dropdown */
+    .dropdown-options::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transform: skewX(-15deg);
+      transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      pointer-events: none;
+    }
+
+    .dropdown-options.show::before {
+      left: 125%;
+    }
+
+    /* password eye toggle */
+    .toggle-password {
+      position: absolute;
+      right: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+      z-index: 5;
+    }
+
+    .toggle-password:hover {
+      color: white;
+    }
+
+    /* Role selection styling */
+    .role-selection {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .role-option {
+      flex: 1;
+      position: relative;
+    }
+
+    .role-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .role-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 1.2rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .role-option input[type="radio"]:checked + .role-label {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: rgba(255, 255, 255, 0.5);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .role-label:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .role-option input[type="radio"]:checked + .role-label:hover {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .role-icon {
+      margin-right: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    /* Two-column form fields */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* register button */
+    .register-btn {
+      width: 100%;
+      background: linear-gradient(95deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 3rem;
+      padding: 0.95rem;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      color: white;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      box-shadow: 0 8px 18px rgba(102, 126, 234, 0.3);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+
+    .register-btn i {
+      font-size: 1.1rem;
+      transition: transform 0.2s;
+    }
+
+    .register-btn:hover {
+      background: linear-gradient(95deg, #764ba2, #667eea);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(102, 126, 234, 0.4);
+    }
+
+    .register-btn:hover i {
+      transform: translateX(4px);
+    }
+
+    .register-btn:active {
+      transform: translateY(2px);
+    }
+
+    /* login link */
+    .login-link {
+      text-align: center;
+      margin-top: 1.8rem;
+      font-size: 0.85rem;
+      color: rgba(235, 245, 255, 0.8);
+    }
+
+    .login-link a {
+      color: #b8d0ff;
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 0.3rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.2s;
+    }
+
+    .login-link a:hover {
+      color: white;
+      border-bottom-color: white;
+      transform: scale(1.05);
+    }
+
+    /* extra micro-interactions + responsive */
+    @media (max-width: 550px) {
+      .card-content {
+        padding: 1.8rem 1.4rem 2rem;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .glass-card {
+        max-width: 95%;
+      }
+      .role-selection {
+        flex-direction: column;
+      }
+    }
+
+    /* subtle pulse on card for extra liquid shine */
+    @keyframes subtleGlow {
+      0% {
+        box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      }
+      100% {
+        box-shadow: 0 30px 50px rgba(0, 0, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+      }
+    }
+    .glass-card {
+      animation: subtleGlow 3s infinite alternate ease-in-out;
+    }
+
+    /* Error message styling for liquid glass theme */
+    .error-message {
+      background: rgba(255, 100, 100, 0.15);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 100, 100, 0.3);
+      border-radius: 1rem;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      color: #ffcccc;
+      font-size: 0.85rem;
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Terms checkbox styling */
+    .terms-group {
+      display: flex;
+      align-items: flex-start;
+      margin: 1.2rem 0;
+      font-size: 0.85rem;
+      color: rgba(240, 245, 255, 0.85);
+    }
+
+    .terms-group input[type="checkbox"] {
+      accent-color: #667eea;
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.5rem;
+      margin-top: 0.1rem;
+      cursor: pointer;
+    }
+
+    .terms-group label {
+      cursor: pointer;
+      line-height: 1.4;
+    }
+
+    .terms-group a {
+      color: #b8d0ff;
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(255, 255, 255, 0.4);
+      transition: all 0.2s;
+    }
+
+    .terms-group a:hover {
+      color: white;
+      border-bottom-color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Liquid animated background blobs -->
+  <div class="blob-container">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+  </div>
+
+  <!-- Full Width Header -->
+  <header class="full-width-header">
+    <div class="header-content">
+      <!-- System Name on Left -->
+      <div class="header-left">
+        <div class="logo-container">
+          <div class="header-logo-icon">
+            <span class="header-logo-text">G</span>
+          </div>
+          <div class="brand-info">
+            <h1 class="brand-title">GPTFMS</h1>
+            <p class="brand-subtitle">Group project team formation Management System</p>
+          </div>
         </div>
+      </div>
+
+      <!-- Login Button on Right -->
+      <div class="header-right">
+        <a href="/login" class="login-btn">
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
+          <span>Sign In</span>
+        </a>
+      </div>
     </div>
-</div>
+  </header>
 
-<style>
-/* Add transitions for user type selection buttons */
-label[for="student"],
-label[for="supervisor"] {
-    transition: all 0.3s ease;
-    transform-origin: center;
-}
+  <!-- Main Register Card with Liquid Glass Effect -->
+  <div class="glass-card">
+    <div class="card-content">
+      <!-- Register Card Header -->
+      <div class="register-card-header">
+        <div class="register-header-icon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <h2 class="register-title">Create Account</h2>
+        <p class="register-subtitle">Join our learning community</p>
+      </div>
 
-label[for="student"]:hover,
-label[for="supervisor"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-</style>
+      <!-- register form -->
+      <form id="registerForm" action="/register" method="POST">
+        @csrf
+        <input type="hidden" name="form_type" value="register">
+        
+        @if ($errors->any())
+            <div class="error-message">
+                <div class="text-sm">
+                    @foreach ($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+        
+        @if(session('error'))
+            <div class="error-message">
+                <div class="text-sm">
+                    <p>{{ session('error') }}</p>
+                </div>
+            </div>
+        @endif
+        
+        <!-- Client-side validation message -->
+        <div id="validation-message" class="error-message hidden" style="display: none;">
+            <div class="text-sm">
+                <p id="validation-text"></p>
+            </div>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="input-group">
+          <div class="role-selection">
+            <div class="role-option">
+              <input type="radio" id="student" name="role" value="student" checked>
+              <label for="student" class="role-label">
+                <i class="fas fa-graduation-cap role-icon"></i>
+                Student
+              </label>
+            </div>
+            <div class="role-option">
+              <input type="radio" id="supervisor" name="role" value="supervisor">
+              <label for="supervisor" class="role-label">
+                <i class="fas fa-chalkboard-teacher role-icon"></i>
+                Supervisor
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Name Fields -->
+        <div class="form-row">
+          <div class="input-group">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" class="input-field" id="first_name" name="first_name" placeholder="First Name" required>
+          </div>
+          <div class="input-group">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" class="input-field" id="last_name" name="last_name" placeholder="Last Name" required>
+          </div>
+        </div>
+
+        <!-- email -->
+        <div class="input-group">
+          <i class="fas fa-envelope input-icon"></i>
+          <input type="email" class="input-field" id="email" name="email" placeholder="Email address" required autocomplete="email">
+        </div>
+
+        <!-- phone -->
+        <div class="input-group">
+          <i class="fas fa-phone input-icon"></i>
+          <input type="tel" class="input-field" id="phone" name="phone" placeholder="Phone number" required>
+        </div>
+
+        <!-- gender -->
+        <div class="input-group">
+          <i class="fas fa-venus-mars input-icon"></i>
+          <div class="custom-dropdown" id="genderDropdown">
+            <div class="dropdown-selected" id="genderSelected">
+              <span class="selected-text">Select gender</span>
+              <i class="fas fa-chevron-down dropdown-arrow"></i>
+            </div>
+            <div class="dropdown-options" id="genderOptions">
+              <div class="dropdown-option" data-value="male">
+                <i class="fas fa-mars option-icon"></i>
+                <span>Male</span>
+              </div>
+              <div class="dropdown-option" data-value="female">
+                <i class="fas fa-venus option-icon"></i>
+                <span>Female</span>
+              </div>
+              <div class="dropdown-option" data-value="other">
+                <i class="fas fa-genderless option-icon"></i>
+                <span>Other</span>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="gender" name="gender" required>
+        </div>
+
+        <!-- Registration Number (shown only for students) -->
+        <div class="input-group" id="registration-number-group">
+          <i class="fas fa-id-card input-icon"></i>
+          <input type="text" class="input-field" id="registration_number" name="registration_number" placeholder="Registration Number" required>
+        </div>
+
+        <!-- password field + eye toggle -->
+        <div class="input-group password-wrapper" style="position: relative;">
+          <i class="fas fa-lock input-icon"></i>
+          <input type="password" class="input-field" id="password" name="password" placeholder="Password" required autocomplete="new-password">
+          <i class="fas fa-eye toggle-password" id="togglePasswordIcon"></i>
+        </div>
+
+        <!-- confirm password -->
+        <div class="input-group password-wrapper" style="position: relative;">
+          <i class="fas fa-lock input-icon"></i>
+          <input type="password" class="input-field" id="password_confirmation" name="password_confirmation" placeholder="Confirm Password" required>
+          <i class="fas fa-eye toggle-password" id="togglePasswordIconConfirm"></i>
+        </div>
+
+        <!-- terms and conditions -->
+        <div class="terms-group">
+          <input type="checkbox" id="terms" name="terms" required>
+          <label for="terms">
+            I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a>
+          </label>
+        </div>
+
+        <!-- register button -->
+        <button type="submit" class="register-btn">
+          <span>Create Account</span> <i class="fas fa-arrow-right"></i>
+        </button>
+
+        <!-- login link -->
+        <div class="login-link">
+          Already have an account? <a href="/login">Sign In</a>
+        </div>
+      </form>
+    </div>
+  </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const studentRadio = document.getElementById('student');
-    const supervisorRadio = document.getElementById('supervisor');
-    const roleDescription = document.getElementById('role-description');
-    const registrationWrapper = document.getElementById('registration-number-wrapper');
-    
-    console.log('Initializing registration form');
-    
-    if (studentRadio && supervisorRadio && roleDescription && registrationWrapper) {
-        
-        function updateRegistrationField() {
-            console.log('Updating registration field');
-            console.log('Student checked:', studentRadio.checked);
-            console.log('Supervisor checked:', supervisorRadio.checked);
-            
-            if (studentRadio.checked) {
-                // Show registration number field for student
-                registrationWrapper.innerHTML = `
-                    <div class="mb-4">
-                        <label for="registration_number" class="block text-sm font-medium text-gray-700 mb-2">
-                            Registration Number *
-                        </label>
-                        <input id="registration_number" name="registration_number" type="text" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                               placeholder="Enter your registration number">
-                        <p class="mt-1 text-xs text-gray-500">
-                            Your unique registration or student ID number.
-                        </p>
-                    </div>
-                `;
-                roleDescription.textContent = 'Students can join groups and participate in projects.';
-                console.log('Registration field added for student');
+    (function() {
+      // ---------- PASSWORD TOGGLE (Liquid glass usability) ----------
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('togglePasswordIcon');
+      const confirmInput = document.getElementById('password_confirmation');
+      const toggleIconConfirm = document.getElementById('togglePasswordIconConfirm');
+
+      function setupPasswordToggle(input, icon) {
+        if (icon && input) {
+          icon.addEventListener('click', function(e) {
+            e.preventDefault();
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            // toggle eye / eye-slash icon
+            if (type === 'text') {
+              icon.classList.remove('fa-eye');
+              icon.classList.add('fa-eye-slash');
             } else {
-                // Hide registration number field for supervisor
-                registrationWrapper.innerHTML = '';
-                roleDescription.textContent = 'Supervisors can create and manage groups and projects.';
-                console.log('Registration field removed for supervisor');
+              icon.classList.remove('fa-eye-slash');
+              icon.classList.add('fa-eye');
             }
+          });
         }
+      }
+
+      setupPasswordToggle(passwordInput, toggleIcon);
+      setupPasswordToggle(confirmInput, toggleIconConfirm);
+
+      // ---------- ADVANCED GENDER DROPDOWN ----------
+      const genderDropdown = document.getElementById('genderDropdown');
+      const genderSelected = document.getElementById('genderSelected');
+      const genderOptions = document.getElementById('genderOptions');
+      const genderInput = document.getElementById('gender');
+      const genderOptionsList = genderOptions ? genderOptions.querySelectorAll('.dropdown-option') : [];
+
+      function toggleGenderDropdown() {
+        const isOpen = genderOptions.classList.contains('show');
         
-        // Handle radio button changes
+        if (isOpen) {
+          genderOptions.classList.remove('show');
+          genderSelected.classList.remove('active');
+        } else {
+          genderOptions.classList.add('show');
+          genderSelected.classList.add('active');
+        }
+      }
+
+      function selectGenderOption(option) {
+        const value = option.dataset.value;
+        const text = option.querySelector('span').textContent;
+        const icon = option.querySelector('i').className;
+        
+        // Update selected display
+        genderSelected.querySelector('.selected-text').textContent = text;
+        genderSelected.querySelector('.dropdown-arrow').className = 'fas fa-chevron-down dropdown-arrow';
+        
+        // Update hidden input
+        genderInput.value = value;
+        
+        // Update selected state
+        genderOptionsList.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        
+        // Close dropdown
+        genderOptions.classList.remove('show');
+        genderSelected.classList.remove('active');
+      }
+
+      // Initialize dropdown
+      if (genderDropdown && genderSelected && genderOptions && genderInput) {
+        // Toggle dropdown on click
+        genderSelected.addEventListener('click', function(e) {
+          e.stopPropagation();
+          toggleGenderDropdown();
+        });
+
+        // Handle option selection
+        genderOptionsList.forEach(option => {
+          option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            selectGenderOption(this);
+          });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!genderDropdown.contains(e.target)) {
+            genderOptions.classList.remove('show');
+            genderSelected.classList.remove('active');
+          }
+        });
+
+        // Keyboard navigation
+        genderSelected.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleGenderDropdown();
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (!genderOptions.classList.contains('show')) {
+              toggleGenderDropdown();
+            } else {
+              // Focus next option
+              const currentIndex = Array.from(genderOptionsList).findIndex(opt => opt.classList.contains('selected'));
+              const nextIndex = (currentIndex + 1) % genderOptionsList.length;
+              selectGenderOption(genderOptionsList[nextIndex]);
+            }
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (!genderOptions.classList.contains('show')) {
+              toggleGenderDropdown();
+            } else {
+              // Focus previous option
+              const currentIndex = Array.from(genderOptionsList).findIndex(opt => opt.classList.contains('selected'));
+              const prevIndex = currentIndex === 0 ? genderOptionsList.length - 1 : currentIndex - 1;
+              selectGenderOption(genderOptionsList[prevIndex]);
+            }
+          } else if (e.key === 'Escape') {
+            genderOptions.classList.remove('show');
+            genderSelected.classList.remove('active');
+          }
+        });
+
+        // Add hover effects
+        genderOptionsList.forEach(option => {
+          option.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(8px) scale(1.02)';
+          });
+          
+          option.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('selected')) {
+              this.style.transform = 'translateX(0) scale(1)';
+            }
+          });
+        });
+      }
+
+      // ---------- ROLE SELECTION ----------
+      const studentRadio = document.getElementById('student');
+      const supervisorRadio = document.getElementById('supervisor');
+      const registrationGroup = document.getElementById('registration-number-group');
+
+      function updateRegistrationField() {
+        if (studentRadio.checked) {
+          registrationGroup.style.display = 'block';
+          document.getElementById('registration_number').required = true;
+        } else {
+          registrationGroup.style.display = 'none';
+          document.getElementById('registration_number').required = false;
+        }
+      }
+
+      if (studentRadio && supervisorRadio && registrationGroup) {
         studentRadio.addEventListener('change', updateRegistrationField);
         supervisorRadio.addEventListener('change', updateRegistrationField);
-        
-        // Handle label clicks
-        const studentLabel = document.querySelector('label[for="student"]');
-        const supervisorLabel = document.querySelector('label[for="supervisor"]');
-        
-        if (studentLabel) {
-            studentLabel.addEventListener('click', function(e) {
-                e.preventDefault();
-                studentRadio.checked = true;
-                supervisorRadio.checked = false;
-                updateRegistrationField();
-            });
-        }
-        
-        if (supervisorLabel) {
-            supervisorLabel.addEventListener('click', function(e) {
-                e.preventDefault();
-                supervisorRadio.checked = true;
-                studentRadio.checked = false;
-                updateRegistrationField();
-            });
-        }
-        
-        // Initialize on page load
-        updateRegistrationField();
-        console.log('Registration form initialized successfully');
-        
-    } else {
-        console.error('Required elements not found');
-    }
-});
+        updateRegistrationField(); // Initialize on page load
+      }
 
-// Form validation
-document.querySelector('form').addEventListener('submit', function(e) {
-    const firstName = document.getElementById('first_name').value.trim();
-    const lastName = document.getElementById('last_name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const password = document.getElementById('password').value;
-    const passwordConfirmation = document.getElementById('password_confirmation').value;
-    const terms = document.getElementById('terms').checked;
-    const selectedRole = document.querySelector('input[name="role"]:checked');
-    
-    // Basic validations
-    if (firstName.length < 2) {
-        e.preventDefault();
-        alert('First name must be at least 2 characters long.');
-        return false;
-    }
-    
-    if (lastName.length < 2) {
-        e.preventDefault();
-        alert('Last name must be at least 2 characters long.');
-        return false;
-    }
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        e.preventDefault();
-        alert('Please provide a valid email address.');
-        return false;
-    }
-    
-    if (phone.length < 10) {
-        e.preventDefault();
-        alert('Phone number must be at least 10 characters long.');
-        return false;
-    }
-    
-    // Registration number validation for students
-    if (selectedRole && selectedRole.value === 'student') {
-        const registrationNumber = document.getElementById('registration_number');
-        if (!registrationNumber || !registrationNumber.value.trim()) {
-            e.preventDefault();
-            alert('Registration number is required for students.');
-            return false;
+      // ---------- FORM SUBMISSION ----------
+      const form = document.getElementById('registerForm');
+      if (form) {
+        form.addEventListener('submit', function(event) {
+          const firstName = document.getElementById('first_name');
+          const lastName = document.getElementById('last_name');
+          const emailField = document.getElementById('email');
+          const phoneField = document.getElementById('phone');
+          const passwordField = document.getElementById('password');
+          const confirmField = document.getElementById('password_confirmation');
+          const termsField = document.getElementById('terms');
+          
+          const firstNameVal = firstName ? firstName.value.trim() : '';
+          const lastNameVal = lastName ? lastName.value.trim() : '';
+          const email = emailField ? emailField.value.trim() : '';
+          const phone = phoneField ? phoneField.value.trim() : '';
+          const password = passwordField ? passwordField.value : '';
+          const confirm = confirmField ? confirmField.value : '';
+          const terms = termsField ? termsField.checked : false;
+
+          // Clear all existing error messages
+          const validationMessage = document.getElementById('validation-message');
+          const validationText = document.getElementById('validation-text');
+          if (validationMessage && validationText) {
+            validationMessage.classList.add('hidden');
+            validationMessage.style.display = 'none';
+            validationText.textContent = '';
+          }
+          
+          // Clear any server error messages
+          const serverErrors = document.querySelectorAll('.error-message');
+          serverErrors.forEach(error => {
+            if (!error.id || error.id !== 'validation-message') {
+              error.remove();
+            }
+          });
+
+          // Validate required fields
+          if (firstNameVal === '' || lastNameVal === '' || email === '' || phone === '' || password === '' || confirm === '') {
+            event.preventDefault();
+            if (validationMessage && validationText) {
+              validationMessage.classList.remove('hidden');
+              validationMessage.style.display = 'block';
+              validationText.textContent = 'Please fill in all required fields.';
+            }
+            // highlight empty fields
+            if (firstNameVal === '') firstName.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            if (lastNameVal === '') lastName.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            if (email === '') emailField.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            if (phone === '') phoneField.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            if (password === '') passwordField.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            if (confirm === '') confirmField.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            setTimeout(() => {
+              if (firstName) firstName.style.borderColor = '';
+              if (lastName) lastName.style.borderColor = '';
+              if (emailField) emailField.style.borderColor = '';
+              if (phoneField) phoneField.style.borderColor = '';
+              if (passwordField) passwordField.style.borderColor = '';
+              if (confirmField) confirmField.style.borderColor = '';
+            }, 1500);
+            return;
+          }
+
+          // Validate email format
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            event.preventDefault();
+            if (validationMessage && validationText) {
+              validationMessage.classList.remove('hidden');
+              validationMessage.style.display = 'block';
+              validationText.textContent = 'Please provide a valid email address.';
+            }
+            if (emailField) emailField.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            setTimeout(() => {
+              if (emailField) emailField.style.borderColor = '';
+            }, 1500);
+            return;
+          }
+
+          // Validate password match
+          if (password !== confirm) {
+            event.preventDefault();
+            if (validationMessage && validationText) {
+              validationMessage.classList.remove('hidden');
+              validationMessage.style.display = 'block';
+              validationText.textContent = 'Password confirmation does not match.';
+            }
+            if (passwordField) passwordField.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            if (confirmField) confirmField.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            setTimeout(() => {
+              if (passwordField) passwordField.style.borderColor = '';
+              if (confirmField) confirmField.style.borderColor = '';
+            }, 1500);
+            return;
+          }
+
+          // Validate password length
+          if (password.length < 8) {
+            event.preventDefault();
+            if (validationMessage && validationText) {
+              validationMessage.classList.remove('hidden');
+              validationMessage.style.display = 'block';
+              validationText.textContent = 'Password must be at least 8 characters long.';
+            }
+            if (passwordField) passwordField.style.borderColor = 'rgba(255, 100, 100, 0.8)';
+            setTimeout(() => {
+              if (passwordField) passwordField.style.borderColor = '';
+            }, 1500);
+            return;
+          }
+
+          // Validate terms
+          if (!terms) {
+            event.preventDefault();
+            if (validationMessage && validationText) {
+              validationMessage.classList.remove('hidden');
+              validationMessage.style.display = 'block';
+              validationText.textContent = 'You must agree to the terms and conditions.';
+            }
+            return;
+          }
+
+          // Show loading state
+          const btn = document.querySelector('.register-btn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Creating Account...';
+          btn.disabled = true;
+
+          // Allow form to submit normally after validation
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+          }, 3000);
+        });
+      }
+
+      // Additional dynamic liquid glass: micro movement on card (parallax light)
+      const card = document.querySelector('.glass-card');
+      if (card) {
+        document.addEventListener('mousemove', function(e) {
+          // subtle rotation / tilt effect to enhance glass depth
+          const mouseX = e.clientX / window.innerWidth;
+          const mouseY = e.clientY / window.innerHeight;
+          const rotateY = (mouseX - 0.5) * 3;
+          const rotateX = (mouseY - 0.5) * -2;
+          card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
+          card.style.transition = 'transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+        });
+
+        document.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+        });
+      }
+
+      // Fade in animations
+      setTimeout(() => {
+        const header = document.querySelector('.register-card-header');
+        if (header) {
+          header.classList.add('fade-in');
         }
-    }
-    
-    if (password.length < 8) {
-        e.preventDefault();
-        alert('Password must be at least 8 characters long.');
-        return false;
-    }
-    
-    if (password !== passwordConfirmation) {
-        e.preventDefault();
-        alert('Password confirmation does not match.');
-        return false;
-    }
-    
-    if (!terms) {
-        e.preventDefault();
-        alert('You must agree to the terms and conditions.');
-        return false;
-    }
-    
-    return true;
-});
+      }, 100);
+
+      setTimeout(() => {
+        const title = document.querySelector('.register-title');
+        if (title) {
+          title.classList.add('fade-in');
+        }
+      }, 200);
+
+      setTimeout(() => {
+        const subtitle = document.querySelector('.register-subtitle');
+        if (subtitle) {
+          subtitle.classList.add('fade-in');
+        }
+      }, 300);
+    })();
 </script>
 
-@endsection
+</body>
+</html>

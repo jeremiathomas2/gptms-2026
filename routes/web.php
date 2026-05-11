@@ -514,11 +514,120 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::post('/admin/users/{id}/toggle', function ($id) {
         $user = \App\Models\User::findOrFail($id);
-        $user->is_active = !$user->is_active;
+        $currentStatus = $user->status ? $user->status : 'active';
+        $user->status = $currentStatus === 'active' ? 'inactive' : 'active';
         $user->save();
         
-        return redirect()->back()->with('success', 'User status updated successfully!');
+        return response()->json([
+            'success' => true,
+            'message' => 'User status updated successfully!'
+        ]);
     })->name('admin.users.toggle');
+    
+    // Additional user management routes
+    Route::post('/admin/users/{id}/reset-password', function ($id) {
+        $user = \App\Models\User::findOrFail($id);
+        
+        // Generate temporary password
+        $tempPassword = \Str::random(10);
+        $user->password = \Hash::make($tempPassword);
+        $user->save();
+        
+        // Log the password reset
+        \Log::info('Password reset for user: ' . $user->id . ' by admin');
+        
+        return response()->json([
+            'success' => true,
+            'message' => "Password reset successfully. Temporary password: {$tempPassword}"
+        ]);
+    })->name('admin.users.reset-password');
+    
+    Route::get('/admin/users/export', function (Illuminate\Http\Request $request) {
+        $query = \App\Models\User::with('roles');
+        
+        // Apply filters based on request parameters
+        if ($request->has('status')) {
+            $statuses = $request->query('status');
+            if (!is_array($statuses)) {
+                $statuses = [$statuses];
+            }
+            $query->whereIn('status', $statuses);
+        }
+        
+        if ($request->has('role')) {
+            $roles = $request->query('role');
+            if (!is_array($roles)) {
+                $roles = [$roles];
+            }
+            $query->whereHas('roles', function($q) use ($roles) {
+                $q->whereIn('name', $roles);
+            });
+        }
+        
+        $users = $query->get();
+        
+        $csv = "Name,Email,Role,Status,Phone,Created At\n";
+        foreach ($users as $user) {
+            $roleName = $user->roles->first() ? $user->roles->first()->name : 'N/A';
+            $status = $user->status ? $user->status : 'active';
+            $phone = $user->phone ? $user->phone : 'N/A';
+            $csv .= "{$user->name},{$user->email},{$roleName},{$status},{$phone},{$user->created_at->format('Y-m-d')}\n";
+        }
+        
+        $filename = 'users_export_' . date('Y-m-d_H-i-s') . '.csv';
+        
+        return response($csv)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+    })->name('admin.users.export');
+    
+    Route::post('/admin/users/import', function (Illuminate\Http\Request $request) {
+        if (!$request->hasFile('csv_file')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No file uploaded'
+            ]);
+        }
+        
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();
+        
+        // Process CSV import (simplified version)
+        $imported = 0;
+        $failed = 0;
+        
+        if (($handle = fopen($path, 'r')) !== false) {
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                try {
+                    // Skip header row
+                    if ($data[0] === 'Name') continue;
+                    
+                    $user = \App\Models\User::create([
+                        'name' => $data[0] ?? '',
+                        'email' => $data[1] ?? '',
+                        'password' => \Hash::make('password123'),
+                        'phone' => $data[4] ?? null,
+                        'status' => $data[3] ?? 'active'
+                    ]);
+                    
+                    // Assign role if specified
+                    if (!empty($data[2])) {
+                        $user->assignRole($data[2]);
+                    }
+                    
+                    $imported++;
+                } catch (\Exception $e) {
+                    $failed++;
+                }
+            }
+            fclose($handle);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => "Import completed: {$imported} users imported, {$failed} failed"
+        ]);
+    })->name('admin.users.import');
 
     // Admin system settings
     Route::get('/admin/settings', function () {
@@ -572,8 +681,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/groups/{id}/details', [App\Http\Controllers\Admin\GroupSettingsController::class, 'groupDetails'])->name('admin.groups.details');
 });
 
-// Dashboard routes (protected by auth middleware)
-Route::middleware('auth')->group(function () {
+// Authenticated routes
+Route::middleware(['auth', 'role.switch'])->group(function () {
     Route::get('/dashboard', function () {
         $settings = \App\Models\GroupSettings::getCurrent();
         $groups = \App\Models\Group::with('members')->latest()->get();
@@ -835,27 +944,42 @@ function calculateGrowthPercentage($type) {
                 
                 // Validate input
                 $validated = $request->validate([
-                    'name' => 'required|string|max:255',
                     'first_name' => 'required|string|max:255',
                     'last_name' => 'required|string|max:255',
                     'email' => 'required|email|unique:users,email,' . $id,
-                    'registration_number' => 'required|string|unique:users,registration_number,' . $id,
+                    'registration_number' => 'nullable|string|unique:users,registration_number,' . $id,
                     'phone' => 'nullable|string|max:20',
+                    'gender' => 'nullable|in:male,female,other,prefer_not_to_say',
                     'status' => 'required|in:active,inactive,suspended',
                     'role' => 'required|string|exists:roles,name',
                     'password' => 'nullable|string|min:6|confirmed',
                 ]);
                 
                 // Update user information
-                $user->update([
-                    'name' => $validated['name'],
+                $updateData = [
+                    'name' => $validated['first_name'] . ' ' . $validated['last_name'],
                     'first_name' => $validated['first_name'],
                     'last_name' => $validated['last_name'],
                     'email' => $validated['email'],
-                    'registration_number' => $validated['registration_number'],
                     'phone' => $validated['phone'],
+                    'gender' => $validated['gender'] ?? null,
                     'status' => $validated['status'],
-                ]);
+                ];
+                
+                // Only update registration_number if provided (not null)
+                if (isset($validated['registration_number'])) {
+                    $updateData['registration_number'] = $validated['registration_number'];
+                }
+                
+                // Log update data for debugging
+                \Log::info('User update data: ' . json_encode($updateData));
+                \Log::info('User before update: ' . json_encode($user->toArray()));
+                
+                $result = $user->update($updateData);
+                
+                // Log result for debugging
+                \Log::info('User update result: ' . ($result ? 'success' : 'failed'));
+                \Log::info('User after update: ' . json_encode($user->fresh()->toArray()));
                 
                 // Update password if provided
                 if (!empty($validated['password'])) {
@@ -875,45 +999,56 @@ function calculateGrowthPercentage($type) {
                 return redirect()->back()
                     ->withErrors($e->errors())
                     ->withInput();
+            } catch (\Illuminate\Database\QueryException $e) {
+                \Log::error('Database error during user update: ' . $e->getMessage());
+                
+                return redirect()->back()
+                    ->with('error', 'Database error occurred. Please try again.')
+                    ->withInput();
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                \Log::error('User not found during update: ' . $e->getMessage());
+                
+                return redirect()->route('users')->with('error', 'User not found.');
             } catch (\Exception $e) {
                 \Log::error('User update failed: ' . $e->getMessage());
                 
                 return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['update' => 'User update failed. Please try again.']);
+                    ->with('error', 'Failed to update user. Please try again.')
+                    ->withInput();
             }
         })->name('users.update');
 
-        // User delete route
-        Route::delete('/users/{id}', function ($id) {
-            // Check if user is logged in
-            if (!session('user.logged_in')) {
-                return redirect()->route('login')->with('error', 'Please login to delete users.');
+    // Clear notifications route
+    Route::post('/clear-notifications', function () {
+        session()->forget(['success', 'error']);
+        return response()->json(['success' => true]);
+    })->name('notifications.clear');
+
+    // User delete route
+    Route::delete('/users/{id}', function ($id) {
+        try {
+            // Get user from database
+            $user = \App\Models\User::findOrFail($id);
+            
+            // Prevent self-deletion
+            if ($user->id == session('user.id')) {
+                return redirect()->route('users')->with('error', 'You cannot delete your own account.');
             }
             
-            try {
-                // Get user from database
-                $user = \App\Models\User::findOrFail($id);
-                
-                // Prevent self-deletion
-                if ($user->id == session('user.id')) {
-                    return redirect()->route('users')->with('error', 'You cannot delete your own account.');
-                }
-                
-                // Log the user deletion
-                \Log::info('User deleted: ' . $user->email . ' by ' . session('user.email'));
-                
-                // Delete user (this will also delete related records due to foreign key constraints)
-                $user->delete();
-                
-                return redirect()->route('users')->with('success', 'User deleted successfully!');
-                
-            } catch (\Exception $e) {
-                \Log::error('User deletion failed: ' . $e->getMessage());
-                
-                return redirect()->route('users')->with('error', 'User deletion failed. Please try again.');
-            }
-        })->name('users.delete');
+            // Log the user deletion
+            \Log::info('User deleted: ' . $user->email . ' by ' . session('user.email'));
+            
+            // Delete user (this will also delete related records due to foreign key constraints)
+            $user->delete();
+            
+            return redirect()->route('users')->with('success', 'User deleted successfully!');
+            
+        } catch (\Exception $e) {
+            \Log::error('User deletion failed: ' . $e->getMessage());
+            
+            return redirect()->route('users')->with('error', 'User deletion failed. Please try again.');
+        }
+    })->name('users.delete');
 
     });
 
@@ -1020,25 +1155,23 @@ function calculateGrowthPercentage($type) {
             session([
                 'user.first_name' => $validated['first_name'],
                 'user.last_name' => $validated['last_name'],
-                'user.email' => $validated['email'],
-                'user.name' => $validated['first_name'] . ' ' . $validated['last_name'],
             ]);
             
             return redirect()->route('profile')->with('success', 'Profile updated successfully!');
             
         } catch (\Exception $e) {
             \Log::error('Profile update failed: ' . $e->getMessage());
-            
             return redirect()->back()
-                ->withInput()
-                ->withErrors(['profile' => 'Profile update failed. Please try again.']);
+                ->with('error', 'Failed to update profile. Please try again.')
+                ->withInput();
         }
     })->name('profile.update');
 
+    // Profile export route
     Route::get('/profile/export', function () {
         // Check if user is logged in
         if (!session('user.logged_in')) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return redirect()->route('login')->with('error', 'Please login to export your profile.');
         }
         
         // Get user data from database
@@ -1111,6 +1244,235 @@ function calculateGrowthPercentage($type) {
         
         return redirect()->route('settings')->with('success', 'Password updated successfully!');
     })->name('settings.password');
+
+    // Import routes
+    Route::post('/import/students', function (Illuminate\Http\Request $request) {
+        // Check if user is admin
+        if (!auth()->user()->hasRole('admin')) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        try {
+            $jsonData = $request->input('data');
+            
+            if (!$jsonData) {
+                return response()->json(['error' => 'No data provided'], 400);
+            }
+            
+            $data = json_decode($jsonData, true);
+            
+            if (!$data || !is_array($data)) {
+                return response()->json(['error' => 'Invalid JSON data'], 400);
+            }
+            
+            // Get headers from first row
+            $headers = array_keys($data[0] ?? []);
+            
+            // Validate required headers for students
+            $requiredHeaders = ['first_name', 'last_name', 'email', 'registration_number'];
+            foreach ($requiredHeaders as $header) {
+                if (!in_array($header, $headers)) {
+                    return response()->json(['error' => "Missing required column: $header"], 400);
+                }
+            }
+            
+            $importedCount = 0;
+            $errors = [];
+            
+            foreach ($data as $index => $row) {
+                try {
+                    // Validate required fields
+                    if (empty($row['first_name']) || empty($row['last_name']) || 
+                        empty($row['email']) || empty($row['registration_number'])) {
+                        $errors[] = "Row " . ($index + 1) . ": Missing required fields";
+                        continue;
+                    }
+                    
+                    // Validate email format
+                    if (!filter_var($row['email'], FILTER_VALIDATE_EMAIL)) {
+                        $errors[] = "Row " . ($index + 1) . ": Invalid email format";
+                        continue;
+                    }
+                    
+                    // Check if email already exists
+                    if (\App\Models\User::where('email', $row['email'])->exists()) {
+                        $errors[] = "Row " . ($index + 1) . ": Email already exists";
+                        continue;
+                    }
+                    
+                    // Check if registration number already exists
+                    if (\App\Models\User::where('registration_number', $row['registration_number'])->exists()) {
+                        $errors[] = "Row " . ($index + 1) . ": Registration number already exists";
+                        continue;
+                    }
+                    
+                    // Create student user
+                    $user = new \App\Models\User();
+                    $user->first_name = $row['first_name'];
+                    $user->last_name = $row['last_name'];
+                    $user->name = $row['first_name'] . ' ' . $row['last_name'];
+                    $user->email = $row['email'];
+                    $user->registration_number = $row['registration_number'];
+                    $user->phone = $row['phone'] ?? null;
+                    $user->gender = $row['gender'] ?? null;
+                    $user->status = 'active';
+                    $user->password = \Hash::make('password123'); // Default password
+                    $user->save();
+                    
+                    // Assign student role
+                    $user->assignRole('student');
+                    
+                    $importedCount++;
+                    
+                } catch (\Exception $e) {
+                    $errors[] = "Row " . ($index + 1) . ": " . $e->getMessage();
+                }
+            }
+            
+            $response = [
+                'success' => true,
+                'imported' => $importedCount,
+                'errors' => $errors
+            ];
+            
+            return response()->json($response);
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+        }
+    })->name('import.students');
+
+    Route::post('/import/supervisors', function (Illuminate\Http\Request $request) {
+        // Check if user is admin
+        if (!auth()->user()->hasRole('admin')) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        try {
+            $jsonData = $request->input('data');
+            
+            if (!$jsonData) {
+                return response()->json(['error' => 'No data provided'], 400);
+            }
+            
+            $data = json_decode($jsonData, true);
+            
+            if (!$data || !is_array($data)) {
+                return response()->json(['error' => 'Invalid JSON data'], 400);
+            }
+            
+            // Get headers from first row
+            $headers = array_keys($data[0] ?? []);
+            
+            // Validate required headers for supervisors
+            $requiredHeaders = ['first_name', 'last_name', 'email'];
+            foreach ($requiredHeaders as $header) {
+                if (!in_array($header, $headers)) {
+                    return response()->json(['error' => "Missing required column: $header"], 400);
+                }
+            }
+            
+            $importedCount = 0;
+            $errors = [];
+            
+            foreach ($data as $index => $row) {
+                try {
+                    // Validate required fields
+                    if (empty($row['first_name']) || empty($row['last_name']) || 
+                        empty($row['email'])) {
+                        $errors[] = "Row " . ($index + 1) . ": Missing required fields";
+                        continue;
+                    }
+                    
+                    // Validate email format
+                    if (!filter_var($row['email'], FILTER_VALIDATE_EMAIL)) {
+                        $errors[] = "Row " . ($index + 1) . ": Invalid email format";
+                        continue;
+                    }
+                    
+                    // Check if email already exists
+                    if (\App\Models\User::where('email', $row['email'])->exists()) {
+                        $errors[] = "Row " . ($index + 1) . ": Email already exists";
+                        continue;
+                    }
+                    
+                    // Create supervisor user
+                    $user = new \App\Models\User();
+                    $user->first_name = $row['first_name'];
+                    $user->last_name = $row['last_name'];
+                    $user->name = $row['first_name'] . ' ' . $row['last_name'];
+                    $user->email = $row['email'];
+                    $user->phone = $row['phone'] ?? null;
+                    $user->gender = $row['gender'] ?? null;
+                    $user->status = 'active';
+                    $user->password = \Hash::make('password123'); // Default password
+                    $user->save();
+                    
+                    // Assign supervisor role
+                    $user->assignRole('supervisor');
+                    
+                    $importedCount++;
+                    
+                } catch (\Exception $e) {
+                    $errors[] = "Row " . ($index + 1) . ": " . $e->getMessage();
+                }
+            }
+            
+            $response = [
+                'success' => true,
+                'imported' => $importedCount,
+                'errors' => $errors
+            ];
+            
+            return response()->json($response);
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Import failed: ' . $e->getMessage()], 500);
+        }
+    })->name('import.supervisors');
+
+    Route::get('/export/users', function (Illuminate\Http\Request $request) {
+        // Check if user is admin
+        if (!auth()->user()->hasRole('admin')) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        try {
+            // Get users with their roles
+            $users = \App\Models\User::with('roles')->get();
+            
+            // Prepare CSV data
+            $csvData = [];
+            $csvData[] = ['Name', 'Email', 'Role', 'Status'];
+            
+            foreach ($users as $user) {
+                $role = $user->roles->first()->name ?? 'user';
+                $csvData[] = [
+                    $user->name,
+                    $user->email,
+                    ucfirst($role),
+                    ucfirst($user->status)
+                ];
+            }
+            
+            // Create CSV content
+            $csvContent = '';
+            foreach ($csvData as $row) {
+                $csvContent .= '"' . implode('","', array_map('addslashes', $row)) . '"' . "\n";
+            }
+            
+            // Create response
+            $response = response($csvContent, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="users_export_' . date('Y-m-d') . '.csv"',
+            ]);
+            
+            return $response;
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Export failed: ' . $e->getMessage()], 500);
+        }
+    })->name('export.users');
 
     Route::post('/settings/notifications', function (Illuminate\Http\Request $request) {
         // Validate notification preferences

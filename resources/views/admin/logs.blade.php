@@ -90,7 +90,13 @@
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                <div class="flex items-center space-x-3">
+                    <h2 class="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                    <span id="liveStatus" class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                        <span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span>
+                        Live
+                    </span>
+                </div>
                 <div class="flex items-center space-x-2">
                     <input type="text" id="searchLogs" placeholder="Search logs..." 
                            class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -101,7 +107,20 @@
                         <option value="create">Create</option>
                         <option value="update">Update</option>
                         <option value="delete">Delete</option>
+                        <option value="system">System</option>
                     </select>
+                    <select id="filterTime" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                    <button id="autoRefresh" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m0 0l3 9m-3-9v12m0 0l-3-9m3 9H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Auto Refresh</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -179,6 +198,9 @@
 
 @section('scripts')
 <script>
+let autoRefreshInterval = null;
+let isAutoRefreshing = false;
+
 function exportLogs() {
     // Export logs to CSV
     const logs = @json($logs->toArray());
@@ -197,29 +219,197 @@ function exportLogs() {
     window.URL.revokeObjectURL(url);
 }
 
-// Search functionality
-document.getElementById('searchLogs')?.addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('tbody tr');
-    
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
-});
+function refreshLogs() {
+    fetch('/admin/logs')
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newTableBody = doc.querySelector('tbody');
+            const currentTableBody = document.querySelector('tbody');
+            
+            if (newTableBody && currentTableBody) {
+                currentTableBody.innerHTML = newTableBody.innerHTML;
+                
+                // Update statistics
+                updateStatistics(doc);
+                
+                // Show refresh notification
+                showNotification('Activity logs refreshed');
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing logs:', error);
+            showNotification('Error refreshing logs', 'error');
+        });
+}
 
-// Filter functionality
-document.getElementById('filterAction')?.addEventListener('change', function(e) {
-    const filterValue = e.target.value;
+function updateStatistics(doc) {
+    const stats = doc.querySelectorAll('.text-2xl');
+    const currentStats = document.querySelectorAll('.text-2xl');
+    
+    if (stats.length >= 4 && currentStats.length >= 4) {
+        for (let i = 0; i < 4; i++) {
+            currentStats[i].textContent = stats[i].textContent;
+        }
+    }
+}
+
+function toggleAutoRefresh() {
+    const button = document.getElementById('autoRefresh');
+    const status = document.getElementById('liveStatus');
+    
+    if (isAutoRefreshing) {
+        clearInterval(autoRefreshInterval);
+        isAutoRefreshing = false;
+        button.classList.remove('bg-gray-600');
+        button.classList.add('bg-blue-600');
+        button.innerHTML = `
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m0 0l3 9m-3-9v12m0 0l-3-9m3 9H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Auto Refresh</span>
+        `;
+        status.innerHTML = `
+            <span class="inline-block w-2 h-2 bg-gray-500 rounded-full mr-1"></span>
+            Paused
+        `;
+        status.classList.remove('bg-green-100', 'text-green-800');
+        status.classList.add('bg-gray-100', 'text-gray-800');
+    } else {
+        autoRefreshInterval = setInterval(refreshLogs, 10000); // Refresh every 10 seconds
+        isAutoRefreshing = true;
+        button.classList.remove('bg-blue-600');
+        button.classList.add('bg-gray-600');
+        button.innerHTML = `
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Stop Refresh</span>
+        `;
+        status.innerHTML = `
+            <span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span>
+            Live
+        `;
+        status.classList.remove('bg-gray-100', 'text-gray-800');
+        status.classList.add('bg-green-100', 'text-green-800');
+    }
+}
+
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+    }`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+function filterLogs() {
+    const searchTerm = document.getElementById('searchLogs')?.value.toLowerCase() || '';
+    const actionFilter = document.getElementById('filterAction')?.value || '';
+    const timeFilter = document.getElementById('filterTime')?.value || '';
     const rows = document.querySelectorAll('tbody tr');
     
     rows.forEach(row => {
-        if (filterValue === '') {
-            row.style.display = '';
-        } else {
+        let show = true;
+        
+        // Search filter
+        if (searchTerm && !row.textContent.toLowerCase().includes(searchTerm)) {
+            show = false;
+        }
+        
+        // Action filter
+        if (actionFilter && show) {
             const actionCell = row.querySelector('td:nth-child(2)');
             const action = actionCell?.textContent.toLowerCase();
-            row.style.display = action?.includes(filterValue) ? '' : 'none';
+            if (!action?.includes(actionFilter)) {
+                show = false;
+            }
+        }
+        
+        // Time filter
+        if (timeFilter && show) {
+            const dateCell = row.querySelector('td:nth-child(5)');
+            const dateText = dateCell?.textContent;
+            if (dateText) {
+                const logDate = new Date(dateText);
+                const now = new Date();
+                
+                switch (timeFilter) {
+                    case 'today':
+                        if (logDate.toDateString() !== now.toDateString()) {
+                            show = false;
+                        }
+                        break;
+                    case 'week':
+                        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        if (logDate < weekAgo) {
+                            show = false;
+                        }
+                        break;
+                    case 'month':
+                        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        if (logDate < monthAgo) {
+                            show = false;
+                        }
+                        break;
+                }
+            }
+        }
+        
+        row.style.display = show ? '' : 'none';
+    });
+    
+    // Update count of visible rows
+    const visibleCount = document.querySelectorAll('tbody tr[style=""], tbody tr:not([style])').length;
+    const totalCount = rows.length;
+    
+    // Update count display if needed
+    let countDisplay = document.getElementById('filterCount');
+    if (!countDisplay) {
+        countDisplay = document.createElement('div');
+        countDisplay.id = 'filterCount';
+        countDisplay.className = 'text-sm text-gray-500 mt-2';
+        document.querySelector('.overflow-x-auto').appendChild(countDisplay);
+    }
+    
+    countDisplay.textContent = `Showing ${visibleCount} of ${totalCount} activities`;
+}
+
+// Event listeners
+document.getElementById('searchLogs')?.addEventListener('input', filterLogs);
+document.getElementById('filterAction')?.addEventListener('change', filterLogs);
+document.getElementById('filterTime')?.addEventListener('change', filterLogs);
+document.getElementById('autoRefresh')?.addEventListener('click', toggleAutoRefresh);
+
+// Initialize tooltips and other UI elements
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to action badges
+    const actionBadges = document.querySelectorAll('td:nth-child(2) span');
+    actionBadges.forEach(badge => {
+        badge.title = `Action: ${badge.textContent.trim()}`;
+    });
+    
+    // Make timestamps more readable
+    const timeCells = document.querySelectorAll('td:nth-child(5)');
+    timeCells.forEach(cell => {
+        const timeText = cell.textContent;
+        const date = new Date(timeText);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        if (diffMins < 1) {
+            cell.title = 'Just now';
+        } else if (diffMins < 60) {
+            cell.title = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+        } else {
+            cell.title = timeText;
         }
     });
 });

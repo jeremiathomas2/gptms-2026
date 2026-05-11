@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\PeerEvaluation;
 use App\Models\ActivityLog;
+use App\Services\SupervisorAnalyticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -57,20 +58,62 @@ class AnalyticsController extends Controller
 
     private function getSupervisorDashboard()
     {
-        $user = Auth::user();
-        
-        return [
-            'total_projects' => $user->supervisedProjects()->count(),
-            'active_projects' => $user->supervisedProjects()->active()->count(),
-            'completed_projects' => $user->supervisedProjects()->completed()->count(),
-            'total_groups' => $user->supervisedProjects()->whereNotNull('group_id')->count(),
-            'at_risk_projects' => $user->supervisedProjects()->overdue()->count(),
-            'recent_evaluations' => PeerEvaluation::whereHas('project', function ($query) use ($user) {
-                $query->where('supervisor_id', $user->id);
-            })->with(['evaluator', 'evaluated', 'project'])->latest()->take(5)->get(),
-            'project_progress' => $this->getProjectProgressSummary($user),
-            'group_performance' => $this->getGroupPerformanceSummary($user),
-        ];
+        try {
+            $analyticsService = new SupervisorAnalyticsService();
+            return $analyticsService->getDashboardData();
+        } catch (\Exception $e) {
+            \Log::error('Supervisor Dashboard Error', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+            ]);
+            
+            // Return fallback data
+            return [
+                'key_metrics' => [
+                    'total_projects' => 0,
+                    'active_projects' => 0,
+                    'completed_projects' => 0,
+                    'at_risk_projects' => 0,
+                    'total_groups' => 0,
+                    'total_students' => 0,
+                    'average_project_score' => 0,
+                    'completion_rate' => 0,
+                ],
+                'project_performance' => [],
+                'group_effectiveness' => [],
+                'student_performance' => [],
+                'evaluation_insights' => [
+                    'total_evaluations' => 0,
+                    'average_scores' => [
+                        'overall' => 0,
+                        'contribution' => 0,
+                        'teamwork' => 0,
+                        'communication' => 0,
+                        'quality' => 0,
+                        'timeliness' => 0,
+                    ],
+                    'score_distribution' => [
+                        'excellent' => 0,
+                        'good' => 0,
+                        'average' => 0,
+                        'poor' => 0,
+                    ],
+                    'low_performers' => [],
+                    'high_performers' => [],
+                    'evaluation_trends' => [],
+                ],
+                'activity_summary' => [
+                    'recent_activities' => [],
+                    'activity_trends' => [],
+                ],
+                'trend_data' => [
+                    'project_completion_trends' => [],
+                    'student_performance_trends' => [],
+                    'group_formation_trends' => [],
+                ],
+                'error' => 'Unable to load analytics data. Please try again later.',
+            ];
+        }
     }
 
     private function getAdminDashboard()
