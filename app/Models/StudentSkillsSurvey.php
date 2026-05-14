@@ -42,7 +42,9 @@ class StudentSkillsSurvey extends Model
      */
     public static function isCompletedByUser(int $userId): bool
     {
-        return static::where('user_id', $userId)->exists();
+        return static::where('user_id', $userId)
+                    ->whereNotNull('completed_at')
+                    ->exists();
     }
 
     /**

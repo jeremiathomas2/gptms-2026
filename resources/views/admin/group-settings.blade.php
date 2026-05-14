@@ -75,7 +75,7 @@
                            name="participants_per_group" 
                            min="2" 
                            max="10" 
-                           value="{{ $settings->participants_per_group ?? 4 }}"
+                           value="{{ $settings->participants_per_group ?? 3 }}"
                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <p class="text-xs text-gray-500 mt-1">Number of students to assign to each group (2-10)</p>
                 </div>
@@ -211,15 +211,23 @@
 <script>
 let countdownInterval = null;
 
-// Validate datetime field on change
-document.addEventListener('DOMContentLoaded', function() {
-    const datetimeField = document.getElementById('countdown_end_time');
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500 text-white' :
+        type === 'error' ? 'bg-red-500 text-white' :
+        'bg-blue-500 text-white'
+    }`;
+    notification.textContent = message;
     
-    if (datetimeField) {
-        datetimeField.addEventListener('change', validateDateTime);
-        datetimeField.addEventListener('blur', validateDateTime);
-    }
-});
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
 
 function validateDateTime() {
     const datetimeField = document.getElementById('countdown_end_time');
@@ -246,7 +254,57 @@ function validateDateTime() {
     }
 }
 
-function startCountdown() {
+// Validate datetime field on change
+document.addEventListener('DOMContentLoaded', function() {
+    const datetimeField = document.getElementById('countdown_end_time');
+    
+    if (datetimeField) {
+        datetimeField.addEventListener('change', validateDateTime);
+        datetimeField.addEventListener('blur', validateDateTime);
+    }
+    
+    // Form submission event listener
+    const form = document.getElementById('group-settings-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate datetime field before submission
+            if (datetimeField) {
+                validateDateTime();
+                
+                // Check if validation failed
+                if (datetimeField.validity.valid === false) {
+                    showNotification('Please select a valid future date and time.', 'error');
+                    return;
+                }
+            }
+            
+            const formData = new FormData(this);
+            
+            fetch('{{ route("admin.group-settings.update") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Settings saved successfully!', 'success');
+                } else {
+                    showNotification(data.message || 'Error saving settings', 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error saving settings', 'error');
+            });
+        });
+    }
+});
+
+window.startCountdown = function() {
     console.log('Start countdown button clicked');
     
     const form = document.getElementById('group-settings-form');
@@ -287,9 +345,9 @@ function startCountdown() {
         console.error('Error:', error);
         showNotification('Error starting countdown', 'error');
     });
-}
+};
 
-function stopCountdown() {
+window.stopCountdown = function() {
     fetch('{{ route("admin.group-settings.update") }}', {
         method: 'POST',
         headers: {
@@ -314,7 +372,7 @@ function stopCountdown() {
     });
 }
 
-function createGroupsNow() {
+window.createGroupsNow = function() {
     if (confirm('Are you sure you want to create groups now? This will use the current settings and cannot be undone.')) {
         fetch('{{ route("admin.create-groups") }}', {
             method: 'POST',
@@ -337,46 +395,7 @@ function createGroupsNow() {
     }
 }
 
-// Form submission
-document.getElementById('group-settings-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Validate datetime field before submission
-    const datetimeField = document.getElementById('countdown_end_time');
-    if (datetimeField) {
-        validateDateTime();
-        
-        // Check if validation failed
-        if (datetimeField.validity.valid === false) {
-            showNotification('Please select a valid future date and time.', 'error');
-            return;
-        }
-    }
-    
-    const formData = new FormData(this);
-    
-    fetch('{{ route("admin.group-settings.update") }}', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showNotification('Settings saved successfully!', 'success');
-        } else {
-            showNotification(data.message || 'Error saving settings', 'error');
-        }
-    })
-    .catch(error => {
-        showNotification('Error saving settings', 'error');
-    });
-});
-
 // Live countdown update
-@if($settings && $settings->is_countdown_running())
 function updateCountdown() {
     fetch('{{ route("admin.countdown-status") }}')
         .then(response => response.json())
@@ -386,8 +405,11 @@ function updateCountdown() {
                 const minutes = Math.floor((data.remaining_time % 3600) / 60);
                 const seconds = data.remaining_time % 60;
                 
-                document.getElementById('countdown-display').textContent = 
-                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                const countdownDisplay = document.getElementById('countdown-display');
+                if (countdownDisplay) {
+                    countdownDisplay.textContent = 
+                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
             } else {
                 // Countdown finished, reload page
                 setTimeout(() => window.location.reload(), 2000);
@@ -398,26 +420,10 @@ function updateCountdown() {
         });
 }
 
-// Update countdown every second
-countdownInterval = setInterval(updateCountdown, 1000);
-@endif
-
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-        type === 'success' ? 'bg-green-500 text-white' :
-        type === 'error' ? 'bg-red-500 text-white' :
-        'bg-blue-500 text-white'
-    }`;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
+// Update countdown every second if countdown is running
+const isCountdownRunning = {{ $settings && $settings->is_countdown_running() ? 'true' : 'false' }};
+if (isCountdownRunning) {
+    countdownInterval = setInterval(updateCountdown, 1000);
 }
 </script>
 @endsection

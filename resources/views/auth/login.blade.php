@@ -226,25 +226,6 @@
       justify-content: flex-start;
     }
 
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: #4285f4;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 12px;
-      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
-    }
-
-    .logo-text {
-      color: white;
-      font-weight: bold;
-      font-size: 18px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
     .header-logo-icon {
       width: 48px;
       height: 48px;
@@ -1006,7 +987,7 @@
         forgotLink.addEventListener('click', (e) => {
           e.preventDefault();
           // You can implement actual forgot password functionality here
-          alert('🌀 Reset link would be sent to your email. Liquid security at its finest.');
+          alert('This feature coming soon ..');
         });
       }
 

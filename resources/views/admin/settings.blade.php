@@ -379,7 +379,7 @@
 
 <script>
 function selectAllPermissions(role) {
-    const checkboxes = document.querySelectorAll(`input[name="permissions[${role}][\\w+]"]`);
+    const checkboxes = document.querySelectorAll(`input[name^="permissions[${role}]["]`);
     checkboxes.forEach(checkbox => {
         checkbox.checked = true;
     });

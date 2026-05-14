@@ -32,6 +32,7 @@
                 <span class="whitespace-nowrap">Export Report</span>
             </button>
             @endif
+            {{-- Debug: Show survey completion status --}}
             @if(session('user.role') === 'student' && !$surveyCompleted)
             <a href="/survey" class="w-full sm:w-auto px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center justify-center sm:justify-start space-x-2">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

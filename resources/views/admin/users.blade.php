@@ -32,13 +32,13 @@
             </button>
             <button onclick="window.location.reload()" class="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-1 text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m0 0l3 9m-3-9v12m0 0l-3-9m3 9H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h1m15 2A8 8 0 005 9m0 0H9m0 0l3 9m-3-9v12m0 0l-3-9m3 9H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <span class="hidden sm:inline">Refresh</span>
             </button>
             <button onclick="addUser()" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-1 text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6a1 1 0 011 1l5 5a1 1 0 011 1V19a2 2 0 01-2 2z"/>
                 </svg>
                 <span class="hidden sm:inline">Add User</span>
             </button>
@@ -65,6 +65,18 @@
                     <option value="inactive">Inactive</option>
                     <option value="suspended">Suspended</option>
                 </select>
+                <div class="flex items-center border-l border-gray-300 pl-2">
+                    <button onclick="setViewMode('grid')" id="gridViewBtn" class="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors" title="Grid View">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                    </button>
+                    <button onclick="setViewMode('list')" id="listViewBtn" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors" title="List View">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
                 <button onclick="clearFilters()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
                     Clear Filters
                 </button>
@@ -83,7 +95,7 @@
                 </div>
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a4 4 0 110 6M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                 </div>
             </div>
@@ -133,7 +145,7 @@
     </div>
 
     <!-- Users Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="usersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($users as $user)
             <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
                 <div class="p-6">
@@ -226,7 +238,7 @@
                             @method('DELETE')
                             <button type="submit" class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-xs sm:text-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3m0 0h6v-1a1 1 0 001 1m-6 0h6"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3m0 0h6v-1a1 1 0 001 1m-6 0h6"/>
                                 </svg>
                             </button>
                         </form>
@@ -237,7 +249,7 @@
             <div class="col-span-full">
                 <div class="bg-white rounded-lg shadow p-8 text-center">
                     <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a4 4 0 110 6M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">No users found</h3>
                     <p class="text-gray-500">Get started by adding your first user.</p>
@@ -248,11 +260,129 @@
             </div>
         @endforelse
     </div>
+
+    <!-- Users List View (Table) - Hidden by default -->
+    <div id="usersList" class="hidden">
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Groups</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse ($users as $user)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/seed/{{ $user->email }}/40/40.jpg" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
+                                        <div class="text-sm text-gray-500">{{ $user->email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if ($user->hasRole('admin'))
+                                    <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded">Admin</span>
+                                @elseif ($user->hasRole('supervisor'))
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Supervisor</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">Student</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($user->status == 'active')
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">Active</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded">Inactive</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $user->phone ?? 'Not provided' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $user->groupMemberships()->count() }} groups
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Never' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $user->created_at->format('M d, Y') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <button onclick="viewUserDetails({{ $user->id }})" class="text-blue-600 hover:text-blue-900">View</button>
+                                    <button onclick="editUser({{ $user->id }})" class="text-gray-600 hover:text-gray-900">Edit</button>
+                                    <button onclick="toggleUserStatus({{ $user->id }}, '{{ $user->status ?? 'active' }}')" class="text-green-600 hover:text-green-900">Toggle</button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="px-6 py-8 text-center">
+                                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a4 4 0 110 6M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+                                <p class="text-gray-500">Get started by adding your first user.</p>
+                                <button onclick="addUser()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Add User
+                                </button>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 @endsection
 
 @section('scripts')
 <script>
+// View Mode Management
+let currentViewMode = 'grid';
+
+function setViewMode(mode) {
+    currentViewMode = mode;
+    const usersGrid = document.getElementById('usersGrid');
+    const usersList = document.getElementById('usersList');
+    const gridViewBtn = document.getElementById('gridViewBtn');
+    const listViewBtn = document.getElementById('listViewBtn');
+    
+    if (!usersGrid || !usersList || !gridViewBtn || !listViewBtn) {
+        console.error('View toggle elements not found');
+        return;
+    }
+    
+    if (mode === 'grid') {
+        usersGrid.classList.remove('hidden');
+        usersList.classList.add('hidden');
+        gridViewBtn.classList.add('bg-blue-100', 'text-blue-600');
+        gridViewBtn.classList.remove('hover:bg-gray-100', 'text-gray-600');
+        listViewBtn.classList.remove('bg-blue-100', 'text-blue-600');
+        listViewBtn.classList.add('hover:bg-gray-100', 'text-gray-600');
+    } else {
+        usersGrid.classList.add('hidden');
+        usersList.classList.remove('hidden');
+        listViewBtn.classList.add('bg-blue-100', 'text-blue-600');
+        listViewBtn.classList.remove('hover:bg-gray-100', 'text-gray-600');
+        gridViewBtn.classList.remove('bg-blue-100', 'text-blue-600');
+        gridViewBtn.classList.add('hover:bg-gray-100', 'text-gray-600');
+    }
+    
+    // Re-apply filters after switching views
+    filterUsers();
+}
+
 // User Management Functions
 function addUser() {
     window.location.href = '/register';
@@ -452,32 +582,247 @@ function bulkActions() {
 }
 
 // Search and Filter Functions
+let searchTimeout;
+
 function clearFilters() {
-    document.getElementById('userSearch').value = '';
-    document.getElementById('roleFilter').value = '';
-    document.getElementById('statusFilter').value = '';
+    const searchInput = document.getElementById('userSearch');
+    const roleFilter = document.getElementById('roleFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    
+    if (searchInput) searchInput.value = '';
+    if (roleFilter) roleFilter.value = '';
+    if (statusFilter) statusFilter.value = '';
+    
+    // Clear any pending search timeout
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+        searchTimeout = null;
+    }
+    
     filterUsers();
 }
 
-function filterUsers() {
-    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-    const roleFilter = document.getElementById('roleFilter').value.toLowerCase();
-    const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
-    const userCards = document.querySelectorAll('.grid > div');
+function debounceSearch() {
+    // Clear any pending search timeout
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
     
-    userCards.forEach(card => {
-        const userName = card.querySelector('h3')?.textContent.toLowerCase() || '';
-        const userEmail = card.querySelector('p')?.textContent.toLowerCase() || '';
-        const userRole = card.querySelector('span[class*="bg-"]')?.textContent.toLowerCase() || '';
-        const userStatus = card.querySelector('.space-y-2 > div:first-child span span')?.textContent.toLowerCase() || '';
-        
-        const matchesSearch = userName.includes(searchTerm) || userEmail.includes(searchTerm);
-        const matchesRole = !roleFilter || userRole === roleFilter;
-        const matchesStatus = !statusFilter || userStatus === statusFilter;
-        
-        const shouldShow = matchesSearch && matchesRole && matchesStatus;
-        card.style.display = shouldShow ? '' : 'none';
+    // Set new timeout for 300ms delay
+    searchTimeout = setTimeout(() => {
+        filterUsers();
+        searchTimeout = null;
+    }, 300);
+}
+
+function filterUsers() {
+    const searchInput = document.getElementById('userSearch');
+    const roleFilter = document.getElementById('roleFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    
+    if (!searchInput || !roleFilter || !statusFilter) {
+        return;
+    }
+    
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const roleFilterValue = roleFilter.value.toLowerCase();
+    const statusFilterValue = statusFilter.value.toLowerCase();
+    
+    // Show loading state for better UX
+    showSearchLoading(true);
+    
+    let visibleCount = 0;
+    let totalCount = 0;
+    
+    // Use setTimeout to prevent UI blocking during search
+    setTimeout(() => {
+        performFiltering(searchTerm, roleFilterValue, statusFilterValue);
+        showSearchLoading(false);
+    }, 10);
+}
+
+function performFiltering(searchTerm, roleFilterValue, statusFilterValue) {
+    // Clear previous highlights
+    clearSearchHighlights();
+    
+    let visibleCount = 0;
+    let totalCount = 0;
+    
+    // Filter grid view
+    const usersGrid = document.getElementById('usersGrid');
+    if (usersGrid) {
+        const userCards = usersGrid.children;
+        for (let card of userCards) {
+            if (card.classList.contains('col-span-full')) {
+                card.style.display = '';
+                continue;
+            }
+            
+            totalCount++;
+            
+            // Get user data from card
+            const userNameElement = card.querySelector('h3');
+            const userEmailElement = card.querySelector('p[class*="text-gray-500"]');
+            const userRoleElement = card.querySelector('span[class*="bg-purple-100"], span[class*="bg-green-100"], span[class*="bg-blue-100"]');
+            const userStatusElement = card.querySelector('.space-y-2 > div:first-child span span');
+            
+            const userName = userNameElement ? userNameElement.textContent.toLowerCase() : '';
+            const userEmail = userEmailElement ? userEmailElement.textContent.toLowerCase() : '';
+            const userRole = userRoleElement ? userRoleElement.textContent.toLowerCase() : '';
+            const userStatus = userStatusElement ? userStatusElement.textContent.toLowerCase() : '';
+            
+            // Enhanced search: search in name, email, role, and status
+            const matchesSearch = !searchTerm || 
+                userName.includes(searchTerm) || 
+                userEmail.includes(searchTerm) || 
+                userRole.includes(searchTerm) || 
+                userStatus.includes(searchTerm);
+            
+            const matchesRole = !roleFilterValue || userRole.includes(roleFilterValue);
+            const matchesStatus = !statusFilterValue || userStatus.includes(statusFilterValue);
+            
+            const shouldShow = matchesSearch && matchesRole && matchesStatus;
+            card.style.display = shouldShow ? '' : 'none';
+            
+            if (shouldShow) {
+                visibleCount++;
+                // Highlight search terms in visible items
+                if (searchTerm && userNameElement) highlightSearchTerm(userNameElement, searchTerm);
+                if (searchTerm && userEmailElement) highlightSearchTerm(userEmailElement, searchTerm);
+            }
+        }
+    }
+    
+    // Filter list view (table)
+    const usersList = document.getElementById('usersList');
+    if (usersList) {
+        const tableBody = usersList.querySelector('tbody');
+        if (tableBody) {
+            const tableRows = tableBody.querySelectorAll('tr');
+            tableRows.forEach(row => {
+                totalCount++;
+                
+                // Get user data from table row
+                const userNameElement = row.querySelector('.font-medium');
+                const userEmailElement = row.querySelector('.text-gray-500');
+                const userRoleElement = row.querySelector('.bg-purple-100, .bg-green-100, .bg-blue-100');
+                const userStatusElement = row.querySelector('.bg-green-100, .bg-red-100');
+                
+                const userName = userNameElement ? userNameElement.textContent.toLowerCase() : '';
+                const userEmail = userEmailElement ? userEmailElement.textContent.toLowerCase() : '';
+                const userRole = userRoleElement ? userRoleElement.textContent.toLowerCase() : '';
+                const userStatus = userStatusElement ? userStatusElement.textContent.toLowerCase() : '';
+                
+                // Enhanced search: search in name, email, role, and status
+                const matchesSearch = !searchTerm || 
+                    userName.includes(searchTerm) || 
+                    userEmail.includes(searchTerm) || 
+                    userRole.includes(searchTerm) || 
+                    userStatus.includes(searchTerm);
+                
+                const matchesRole = !roleFilterValue || userRole.includes(roleFilterValue);
+                const matchesStatus = !statusFilterValue || userStatus.includes(statusFilterValue);
+                
+                const shouldShow = matchesSearch && matchesRole && matchesStatus;
+                row.style.display = shouldShow ? '' : 'none';
+                
+                if (shouldShow) {
+                    visibleCount++;
+                    // Highlight search terms in visible items
+                    if (searchTerm && userNameElement) highlightSearchTerm(userNameElement, searchTerm);
+                    if (searchTerm && userEmailElement) highlightSearchTerm(userEmailElement, searchTerm);
+                }
+            });
+        }
+    }
+    
+    // Show real-time search feedback
+    showSearchFeedback(visibleCount, totalCount, searchTerm, roleFilterValue, statusFilterValue);
+}
+
+// Search Loading Indicator
+function showSearchLoading(show) {
+    const searchInput = document.getElementById('userSearch');
+    if (!searchInput) return;
+    
+    if (show) {
+        searchInput.classList.add('pl-8');
+        // Use a simple spinner SVG that's properly encoded
+        searchInput.style.backgroundImage = "url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"%3E%3Ccircle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"%239CA3AF\" stroke-width=\"4\"%3E%3C/circle%3E%3Cpath fill=\"%233B82F6\" d=\"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z\"%3E%3C/path%3E%3C/svg%3E')";
+        searchInput.style.backgroundRepeat = 'no-repeat';
+        searchInput.style.backgroundPosition = '8px center';
+        searchInput.style.backgroundSize = '16px 16px';
+    } else {
+        searchInput.classList.remove('pl-8');
+        searchInput.style.backgroundImage = '';
+    }
+}
+
+// Clear Search Highlights
+function clearSearchHighlights() {
+    document.querySelectorAll('.search-highlight').forEach(element => {
+        const parent = element.parentNode;
+        parent.replaceChild(document.createTextNode(element.textContent), element);
+        parent.normalize();
     });
+}
+
+// Highlight Search Terms
+function highlightSearchTerm(element, searchTerm) {
+    if (!searchTerm || !element) return;
+    
+    const text = element.textContent;
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    
+    if (regex.test(text)) {
+        const highlightedHTML = text.replace(regex, '<span class="search-highlight bg-yellow-200 px-1 rounded">$1</span>');
+        element.innerHTML = highlightedHTML;
+    }
+}
+
+// Search Feedback Helper
+function showSearchFeedback(visibleCount, totalCount, searchTerm, roleFilter, statusFilter) {
+    // Remove existing feedback
+    const existingFeedback = document.getElementById('searchFeedback');
+    if (existingFeedback) {
+        existingFeedback.remove();
+    }
+    
+    // Create feedback element
+    const feedback = document.createElement('div');
+    feedback.id = 'searchFeedback';
+    feedback.className = 'text-sm text-gray-600 mt-2 mb-4 text-center';
+    
+    let message = '';
+    
+    if (visibleCount === 0) {
+        message = `<span class="text-red-600">No users found</span>`;
+        if (searchTerm || roleFilter || statusFilter) {
+            message += ` matching your criteria`;
+        }
+    } else if (searchTerm || roleFilter || statusFilter) {
+        message = `Showing <span class="font-medium text-blue-600">${visibleCount}</span> of <span class="font-medium">${totalCount}</span> users`;
+        
+        const activeFilters = [];
+        if (searchTerm) activeFilters.push(`search: "${searchTerm}"`);
+        if (roleFilter) activeFilters.push(`role: ${roleFilter}`);
+        if (statusFilter) activeFilters.push(`status: ${statusFilter}`);
+        
+        if (activeFilters.length > 0) {
+            message += ` (filtered by ${activeFilters.join(', ')})`;
+        }
+    } else {
+        // No active filters, don't show feedback
+        return;
+    }
+    
+    feedback.innerHTML = message;
+    
+    // Insert feedback after the search/filter bar
+    const searchFilterBar = document.querySelector('.bg-white.rounded-lg.shadow.p-4');
+    if (searchFilterBar && searchFilterBar.parentNode) {
+        searchFilterBar.parentNode.insertBefore(feedback, searchFilterBar.nextSibling);
+    }
 }
 
 // Notification Helper
@@ -498,10 +843,32 @@ function showNotification(message, type = 'info') {
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', function() {
-    // Search functionality
+    // Search functionality with debouncing
     const searchInput = document.getElementById('userSearch');
     if (searchInput) {
-        searchInput.addEventListener('input', filterUsers);
+        searchInput.addEventListener('input', debounceSearch);
+        searchInput.addEventListener('keyup', function(e) {
+            // Clear search on Escape key
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                filterUsers();
+            }
+            // Focus search on Ctrl/Cmd+F
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+        });
+        
+        // Add visual feedback for search state
+        searchInput.addEventListener('focus', function() {
+            this.parentElement.classList.add('ring-2', 'ring-blue-500');
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            this.parentElement.classList.remove('ring-2', 'ring-blue-500');
+        });
     }
     
     // Filter functionality
@@ -637,7 +1004,7 @@ function showImportModal() {
             <div class="mb-4">
                 <button onclick="downloadTemplate()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mb-4">
                     <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h6a1 1 0 011 1l5 5a1 1 0 011 1V19a2 2 0 01-2 2z"/>
                     </svg>
                     Download CSV Template
                 </button>

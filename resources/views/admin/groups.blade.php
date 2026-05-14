@@ -146,6 +146,12 @@
                     <div class="flex items-center space-x-4 text-sm text-gray-600">
                         <div class="flex items-center space-x-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20h4v-8a2 2 0 012-2h4a2 2 0 012 2v8h4M9 4h6a2 2 0 012 2v2"/>
+                            </svg>
+                            <span>Group {{ $loop->index + 1 }}</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
                             <span>{{ $group->activeMembers()->count() }}/{{ $group->max_members ?? '∞' }} members</span>
@@ -296,6 +302,7 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group Number</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supervisor</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Members</th>
@@ -307,6 +314,10 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($groups as $group)
                         <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $loop->index + 1 }}</div>
+                                <div class="text-sm text-gray-500">Group {{ $loop->index + 1 }}</div>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div>
                                     <div class="text-sm font-medium text-gray-900">{{ $group->name }}</div>

@@ -35,8 +35,8 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Group Information</h3>
                 <dl class="space-y-3">
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Group ID</dt>
-                        <dd class="text-sm text-gray-900">#{{ $group->id }}</dd>
+                        <dt class="text-sm font-medium text-gray-500">Group Number</dt>
+                        <dd class="text-sm text-gray-900">{{ $group->id }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Created</dt>
@@ -82,6 +82,69 @@
             </div>
         </div>
     </div>
+
+    <!-- Supervisor Information -->
+    @if($group->creator)
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Group Supervisor</h3>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center space-x-4">
+                    <img src="https://picsum.photos/seed/{{ $group->creator->email }}/64/64.jpg" 
+                         alt="{{ $group->creator->name }}" 
+                         class="w-16 h-16 rounded-full border-2 border-purple-200">
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold text-gray-900">{{ $group->creator->name }}</h4>
+                        <p class="text-sm text-gray-600">{{ $group->creator->email }}</p>
+                        <div class="flex items-center space-x-3 mt-2">
+                            <span class="px-3 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                                {{ $group->creator->roles->first()->name ?? 'Supervisor' }}
+                            </span>
+                            @if($group->creator->phone)
+                                <span class="text-sm text-gray-500">
+                                    📞 {{ $group->creator->phone }}
+                                </span>
+                            @endif
+                        </div>
+                        <div class="flex items-center space-x-2 mt-3">
+                            <a href="mailto:{{ $group->creator->email }}" 
+                               class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                Contact Supervisor
+                            </a>
+                            @if(isset($group->creator->profile->office_hours))
+                                <span class="text-xs text-gray-500 bg-gray-100 px-3 py-2 rounded-lg">
+                                    🕐 Office Hours: {{ $group->creator->profile->office_hours }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                
+                @if(isset($group->creator->profile->bio) || isset($group->creator->profile->expertise))
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h5 class="text-sm font-semibold text-gray-900 mb-3">About Supervisor</h5>
+                        @if(isset($group->creator->profile->bio))
+                            <p class="text-sm text-gray-600 mb-3">{{ $group->creator->profile->bio }}</p>
+                        @endif
+                        @if(isset($group->creator->profile->expertise))
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-xs text-gray-500">Expertise:</span>
+                                @foreach(explode(',', $group->creator->profile->expertise) as $skill)
+                                    <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                                        {{ trim($skill) }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
 
     <!-- Group Members -->
     <div class="bg-white rounded-lg shadow">

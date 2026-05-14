@@ -216,6 +216,60 @@
         </div>
     </div>
     
+    <!-- Survey Completion Popup -->
+    @if(isset($showSurveyPopup) && $showSurveyPopup && session('user.role') === 'student' && !$surveyCompleted)
+        <div id="survey-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 transform transition-all">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Complete Your Skills Survey</h3>
+                    <p class="text-gray-600 mb-6">
+                        {{ $studentName }}, please complete filling Your skills to help us better understand your abilities and provide you with personalized learning experiences.
+                    </p>
+                    
+                    @if(session('user.role') === 'student' && !$surveyCompleted)
+                        <div class="flex space-x-3">
+                            <button onclick="completeSurvey({{ $surveyId }})" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                Complete Survey
+                            </button>
+                        </div>
+                    @endif
+                        <button onclick="closeSurveyPopup()" class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                            Later
+                        </button>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mt-4">
+                        You can complete this survey anytime from your profile settings.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            function closeSurveyPopup() {
+                const popup = document.getElementById('survey-popup');
+                if (popup) {
+                    popup.remove();
+                }
+            }
+            
+            function completeSurvey(surveyId) {
+                // Redirect to survey page or open survey modal
+                window.location.href = '/survey/' + surveyId;
+            }
+            
+            // Auto-close popup after 10 seconds if no action taken
+            setTimeout(function() {
+                closeSurveyPopup();
+            }, 10000);
+        </script>
+    @endif
+    
     <!-- Scripts -->
     @vite(['resources/js/app.js'])
     @stack('scripts')

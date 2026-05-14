@@ -69,7 +69,7 @@ class GroupSettingsController extends Controller
     {
         $validated = $request->validate([
             'participants_per_group' => 'required|integer|min:2|max:10',
-            'countdown_minutes' => 'required|integer|min:1|max:1440',
+            'countdown_end_time' => 'required|date|after:now',
             'balance_by_gender' => 'boolean',
             'balance_by_skills' => 'boolean',
             'auto_create_groups' => 'boolean',
@@ -77,13 +77,22 @@ class GroupSettingsController extends Controller
 
         $settings = GroupSettings::getCurrent();
         $oldSettings = $settings->toArray();
-        $settings->fill($validated);
-        $settings->updated_by = session('user.id');
         
-        // If countdown is active, update end time
-        if ($settings->is_active && $settings->countdown_end_time) {
-            $settings->countdown_end_time = now()->addMinutes($validated['countdown_minutes']);
-        }
+        // Calculate countdown minutes from end time
+        $endDateTime = \Carbon\Carbon::parse($validated['countdown_end_time']);
+        $countdownMinutes = now()->diffInMinutes($endDateTime);
+        
+        $settings->fill([
+            'participants_per_group' => $validated['participants_per_group'],
+            'countdown_minutes' => max(1, min($countdownMinutes, 1440)),
+            'balance_by_gender' => $request->boolean('balance_by_gender', true),
+            'balance_by_skills' => $request->boolean('balance_by_skills', true),
+            'auto_create_groups' => $request->boolean('auto_create_groups', true),
+        ]);
+        
+        // Update countdown end time
+        $settings->countdown_end_time = $endDateTime;
+        $settings->updated_by = session('user.id');
         
         $settings->save();
 
@@ -102,16 +111,29 @@ class GroupSettingsController extends Controller
     {
         $validated = $request->validate([
             'participants_per_group' => 'required|integer|min:2|max:10',
-            'countdown_minutes' => 'required|integer|min:1|max:1440',
+            'countdown_end_time' => 'required|date|after:now',
             'balance_by_gender' => 'boolean',
             'balance_by_skills' => 'boolean',
             'auto_create_groups' => 'boolean',
         ]);
 
         $settings = GroupSettings::getCurrent();
-        $settings->fill($validated);
+        
+        // Calculate countdown minutes from end time
+        $endDateTime = \Carbon\Carbon::parse($validated['countdown_end_time']);
+        $countdownMinutes = now()->diffInMinutes($endDateTime);
+        
+        $settings->fill([
+            'participants_per_group' => $validated['participants_per_group'],
+            'countdown_minutes' => max(1, min($countdownMinutes, 1440)),
+            'balance_by_gender' => $request->boolean('balance_by_gender', true),
+            'balance_by_skills' => $request->boolean('balance_by_skills', true),
+            'auto_create_groups' => $request->boolean('auto_create_groups', true),
+        ]);
+        
         $settings->is_active = true;
-        $settings->countdown_end_time = now()->addMinutes($validated['countdown_minutes']);
+        $settings->countdown_start_time = now();
+        $settings->countdown_end_time = $endDateTime;
         $settings->created_by = session('user.id');
         $settings->updated_by = session('user.id');
         

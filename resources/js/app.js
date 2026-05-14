@@ -1,92 +1,109 @@
 // GPTFMS - Local JavaScript functionality
 
-// Import specific lucide icons
-import { 
-    Home, 
-    Users, 
-    Folder, 
-    BarChart3, 
-    FileText, 
-    MessageSquare, 
-    User, 
-    Settings,
-    Bell,
-    Search,
-    Menu,
-    X,
-    ChevronDown,
-    ChevronRight,
-    LogOut,
-    Edit,
-    Trash2,
-    Plus,
-    Eye,
-    EyeOff,
-    Check,
-    XCircle,
-    AlertCircle,
-    TrendingUp,
-    TrendingDown,
-    Calendar,
-    Clock,
-    Filter,
-    Download,
-    Upload,
-    RefreshCw,
-    Save,
-    Mail,
-    Phone,
-    MapPin,
-    Briefcase,
-    BookOpen,
-    Award,
-    Target,
-    Zap,
-    Shield,
-    Lock,
-    Unlock,
-    Key,
-    Database,
-    Server,
-    Cloud,
-    Wifi,
-    Battery,
-    Signal,
-    Volume2,
-    VolumeX,
-    Play,
-    Pause,
-    Square,
-    SkipBack,
-    SkipForward,
-    Repeat,
-    Shuffle,
-    Heart,
-    Star,
-    ThumbsUp,
-    ThumbsDown,
-    Share2,
-    Link,
-    Copy,
-    Clipboard,
-    Scissors,
-    Move,
-    Maximize2,
-    Minimize2,
-    MoreVertical,
-    MoreHorizontal,
-    ChevronLeft,
-    ChevronUp,
-    ArrowUp,
-    ArrowDown,
-    ArrowLeft,
-    ArrowRight,
-    ArrowUpRight,
-    ArrowDownRight,
-    ArrowUpLeft,
-    ArrowDownLeft,
-    HelpCircle
-} from 'lucide';
+// Custom icon implementations to avoid Lucide SVG decimal coordinate issues
+const createIcon = (name, svgContent) => ({
+    name,
+    icon: ({ class: className = '', width = 20, height = 20, ...props }) => {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', className);
+        svg.setAttribute('width', width);
+        svg.setAttribute('height', height);
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        svg.setAttribute('stroke-linecap', 'round');
+        svg.setAttribute('stroke-linejoin', 'round');
+        svg.innerHTML = svgContent;
+        return svg;
+    }
+});
+
+// Define custom icons without decimal coordinates
+const Home = createIcon('home', '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/>');
+const Users = createIcon('users', '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3"/><path d="M16 3a4 4 0 010 8"/>');
+const Folder = createIcon('folder', '<path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>');
+const BarChart3 = createIcon('bar-chart-3', '<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>');
+const FileText = createIcon('file-text', '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/>');
+const MessageSquare = createIcon('message-square', '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>');
+const User = createIcon('user', '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>');
+const Settings = createIcon('settings', '<circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 9.96l4.24 4.24M20.46 14.04l-4.24 4.24M7.76 7.76L3.52 3.52"/>');
+const Bell = createIcon('bell', '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>');
+const Search = createIcon('search', '<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>');
+const Menu = createIcon('menu', '<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>');
+const X = createIcon('x', '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>');
+const ChevronDown = createIcon('chevron-down', '<polyline points="6,9 12,15 18,9"/>');
+const ChevronRight = createIcon('chevron-right', '<polyline points="9,18 15,12 9,6"/>');
+const LogOut = createIcon('log-out', '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/>');
+const Edit = createIcon('edit', '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>');
+const Trash2 = createIcon('trash-2', '<polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>');
+const Plus = createIcon('plus', '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>');
+const Eye = createIcon('eye', '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>');
+const EyeOff = createIcon('eye-off', '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>');
+const Check = createIcon('check', '<polyline points="20,6 9,17 4,12"/>');
+const XCircle = createIcon('x-circle', '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>');
+const AlertCircle = createIcon('alert-circle', '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>');
+const TrendingUp = createIcon('trending-up', '<polyline points="23,6 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/>');
+const TrendingDown = createIcon('trending-down', '<polyline points="23,18 13.5,8.5 8.5,13.5 2,6"/><polyline points="16,13 22,13 22,7"/>');
+const Calendar = createIcon('calendar', '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>');
+const Clock = createIcon('clock', '<circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>');
+const Filter = createIcon('filter', '<polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46 22,3"/>');
+const Download = createIcon('download', '<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/>');
+const Upload = createIcon('upload', '<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/>');
+const RefreshCw = createIcon('refresh-cw', '<polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>');
+const Save = createIcon('save', '<path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/>');
+const Mail = createIcon('mail', '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>');
+const Phone = createIcon('phone', '<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>');
+const MapPin = createIcon('map-pin', '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>');
+const Briefcase = createIcon('briefcase', '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>');
+const BookOpen = createIcon('book-open', '<path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 003-3h7z"/>');
+const Award = createIcon('award', '<circle cx="12" cy="8" r="7"/><polyline points="8.21,13.89 7,23 12,20 17,23 15.79,13.88"/><path d="M12 2l2.39 4.84L20 7.5l-4 3.9L18.5 17 12 13.5 5.5 17 7 11.4 3 7.5l5.61-.66z"/>');
+const Target = createIcon('target', '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>');
+const Zap = createIcon('zap', '<polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>');
+const Shield = createIcon('shield', '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>');
+const Lock = createIcon('lock', '<rect x="3" y="11" width="18" height="10" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>');
+const Unlock = createIcon('unlock', '<rect x="3" y="11" width="18" height="10" rx="2" ry="2"/><path d="M7 11V7a5 5 0 019.9-1"/>');
+const Key = createIcon('key', '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>');
+const Database = createIcon('database', '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>');
+const Server = createIcon('server', '<rect x="2" y="3" width="20" height="4" rx="2"/><rect x="2" y="9" width="20" height="4" rx="2"/><rect x="2" y="15" width="20" height="4" rx="2"/><line x1="6" y1="5" x2="6.01" y2="5"/><line x1="6" y1="11" x2="6.01" y2="11"/><line x1="6" y1="17" x2="6.01" y2="17"/>');
+const Cloud = createIcon('cloud', '<path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>');
+const Wifi = createIcon('wifi', '<path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0m-6.54 8a4 4 0 015.16 0M9.5 16a2 2 0 015 0"/>');
+const Battery = createIcon('battery', '<rect x="1" y="6" width="18" height="12" rx="2" ry="2"/><path d="M23 13v-2a1 1 0 00-1-1h-1"/>');
+const Signal = createIcon('signal', '<path d="M2 20h2.5a2.5 2.5 0 002.5-2.5V17a2.5 2.5 0 00-2.5-2.5H2z"/><path d="M2 14h6.5a2.5 2.5 0 002.5-2.5V11a2.5 2.5 0 00-2.5-2.5H2z"/><path d="M2 8h10.5a2.5 2.5 0 002.5-2.5V5a2.5 2.5 0 00-2.5-2.5H2z"/>');
+const Volume2 = createIcon('volume-2', '<polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>');
+const VolumeX = createIcon('volume-x', '<polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>');
+const Play = createIcon('play', '<polygon points="5,3 19,12 5,21 5,3"/>');
+const Pause = createIcon('pause', '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>');
+const Square = createIcon('square', '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>');
+const SkipBack = createIcon('skip-back', '<polygon points="19,20 9,12 19,4 19,20"/><polygon points="5,20 5,4 13,12 5,20"/>');
+const SkipForward = createIcon('skip-forward', '<polygon points="5,4 15,12 5,20 5,4"/><polygon points="19,4 19,20 11,12 19,4"/>');
+const Repeat = createIcon('repeat', '<polyline points="17,1 21,5 17,9"/><polyline points="7,23 3,19 7,15"/><rect x="1" y="9" width="22" height="6" rx="2" ry="2"/>');
+const Shuffle = createIcon('shuffle', '<polyline points="16,3 21,3 21,8"/><path d="M4 20l4-4 4 4M21 15l-4-4-4 4M3 3h9l9 9M3 3l4 4 4-4"/>');
+const Heart = createIcon('heart', '<path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>');
+const Star = createIcon('star', '<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/>');
+const ThumbsUp = createIcon('thumbs-up', '<path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-2l1.72-8.64A2 2 0 0018.72 9H14z"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h2"/>');
+const ThumbsDown = createIcon('thumbs-down', '<path d="M10 15v4a3 3 0 003 3l4-9V2H5.72A2 2 0 003.72 4L2 12.64A2 2 0 004 15h6z"/><path d="M18 6h2a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>');
+const Share2 = createIcon('share-2', '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.41" x2="15.42" y2="6.58"/><line x1="15.41" y1="17.59" x2="8.59" y2="10.41"/>');
+const Link = createIcon('link', '<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>');
+const Copy = createIcon('copy', '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>');
+const Clipboard = createIcon('clipboard', '<rect x="9" y="2" width="6" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>');
+const Scissors = createIcon('scissors', '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>');
+const Move = createIcon('move', '<polyline points="5,9 2,12 5,15"/><polyline points="9,5 12,2 15,5"/><polyline points="15,19 12,22 9,19"/><polyline points="19,9 22,12 19,15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/>');
+const Maximize2 = createIcon('maximize-2', '<polyline points="15,3 21,3 21,9"/><polyline points="9,21 3,21 3,15"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/>');
+const Minimize2 = createIcon('minimize-2', '<polyline points="4,14 10,14 10,20"/><polyline points="14,4 20,4 20,10"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>');
+const MoreVertical = createIcon('more-vertical', '<circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>');
+const MoreHorizontal = createIcon('more-horizontal', '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>');
+const ChevronLeft = createIcon('chevron-left', '<polyline points="15,18 9,12 15,6"/>');
+const ChevronUp = createIcon('chevron-up', '<polyline points="18,15 12,9 6,15"/>');
+const ArrowUp = createIcon('arrow-up', '<line x1="12" y1="19" x2="12" y2="5"/><polyline points="5,12 12,5 19,12"/>');
+const ArrowDown = createIcon('arrow-down', '<line x1="12" y1="5" x2="12" y2="19"/><polyline points="19,12 12,19 5,12"/>');
+const ArrowLeft = createIcon('arrow-left', '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/>');
+const ArrowRight = createIcon('arrow-right', '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>');
+const ArrowUpRight = createIcon('arrow-up-right', '<line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/>');
+const ArrowDownRight = createIcon('arrow-down-right', '<line x1="7" y1="7" x2="17" y2="17"/><polyline points="7,17 17,17 17,7"/>');
+const ArrowUpLeft = createIcon('arrow-up-left', '<line x1="17" y1="17" x2="7" y2="7"/><polyline points="17,7 7,7 7,17"/>');
+const ArrowDownLeft = createIcon('arrow-down-left', '<line x1="17" y1="7" x2="7" y2="17"/><polyline points="17,17 7,17 7,7"/>');
+const HelpCircle = createIcon('help-circle', '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>');
 
 // Initialize lucide icons
 document.addEventListener('DOMContentLoaded', function() {

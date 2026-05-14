@@ -162,11 +162,46 @@
                     
                     <!-- Group Body -->
                     <div class="p-6 space-y-4">
+                        <!-- Supervisor Information -->
+                        @if($group->creator)
+                            <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                                <div class="flex items-center space-x-3">
+                                    <img src="https://picsum.photos/seed/{{ $group->creator->email }}/48/48.jpg" 
+                                         alt="{{ $group->creator->name }}" 
+                                         class="w-12 h-12 rounded-full border-2 border-purple-200">
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-semibold text-purple-900 mb-1">Group Supervisor</h4>
+                                        <p class="text-sm font-medium text-purple-800">{{ $group->creator->name }}</p>
+                                        <p class="text-xs text-purple-600">{{ $group->creator->email }}</p>
+                                        <div class="flex items-center space-x-2 mt-1">
+                                            <span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
+                                                {{ $group->creator->roles->first()->name ?? 'Supervisor' }}
+                                            </span>
+                                            @if($group->creator->phone)
+                                                <span class="text-xs text-purple-600">
+                                                    📞 {{ $group->creator->phone }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-1">
+                                        <a href="mailto:{{ $group->creator->email }}" 
+                                           class="p-2 text-purple-600 hover:text-purple-800 bg-purple-100 rounded-lg hover:bg-purple-200 transition-colors" 
+                                           title="Contact Supervisor">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        
                         <!-- Group Stats -->
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-gray-50 rounded-lg p-3 text-center">
-                                <div class="text-2xl font-bold text-gray-900">{{ $group->id }}</div>
-                                <div class="text-xs text-gray-500">Group ID</div>
+                                <div class="text-xs text-gray-500">Group Number</div>
+                                <div class="text-2xl font-bold text-gray-900">{{ $loop->index + 1 }}</div>
                             </div>
                             <div class="bg-blue-50 rounded-lg p-3 text-center">
                                 <div class="text-2xl font-bold text-blue-600">{{ $group->created_at->format('M d') }}</div>
